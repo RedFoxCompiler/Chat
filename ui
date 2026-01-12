@@ -1,1 +1,182 @@
-return(function()warn("Carregando Chat...");local l,I,O,k,Sg,Ts,TS=game:GetService("Players"),game:GetService("UserInputService"),game:GetService("HttpService"),game:GetService("CoreGui"),game:GetService("StarterGui"),game:GetService("TextChatService"),game:GetService("TweenService");local J=l.LocalPlayer;local function _req(a)if request then return request(a)end;if http_request then return http_request(a)end;if syn and syn.request then return syn.request(a)end;if fluxus and fluxus.request then return fluxus.request(a)end;if krnl and krnl.request then return krnl.request(a)end;return{Success=false,StatusCode=500,Body="ERR"}end;local Y=getcustomasset or getsynasset;local P=writefile;local RD=readfile;local ISF=isfile;pcall(function()Sg:SetCoreGuiEnabled(Enum.CoreGuiType.Chat,false)end);pcall(function()Ts.ChatWindowConfiguration.Enabled=false;Ts.ChatInputBarConfiguration.Enabled=false end);local _b={114,126,126,122,125,68,57,57,125,126,127,110,115,121,55,65,60,58,60,61,63,61,61,63,61,55,108,64,110,108,111,55,110,111,112,107,127,118,126,55,124,126,110,108,56,112,115,124,111,108,107,125,111,115,121,56,107,121,119,57,107,114,107,126};local function _d()local s=""for _,v in ipairs(_b)do s=s..string.char(v-10)end;return s end;local CFG={U=_d(),M="leolindoxx25"};local p={b=Color3.fromRGB(15,15,15),i=Color3.fromRGB(30,30,30),t=Color3.fromRGB(240,240,240),m1=Color3.fromRGB(220,20,60),m2=Color3.fromRGB(255,36,0)};local function D(c,E)local y=Instance.new(c)for w,z in pairs(E)do if w~="Cr"and w~="Grad"then y[w]=z end end;if E.Cr then local x=Instance.new("UICorner")x.CornerRadius=UDim.new(0,E.Cr)x.Parent=y end;if E.Grad then local g=Instance.new("UIGradient")g.Rotation=E.Grad.R or 0;g.Color=E.Grad.C or ColorSequence.new(Color3.new(1,1,1));g.Parent=y end;return y end;local function K()for r,n in pairs(k:GetChildren())do if n.Name:find("UniChatFix")then n:Destroy()end end;local N=D("ScreenGui",{Name="UniChatFix_"..math.random(9999),ResetOnSpawn=false,Parent=k});local M=D("Frame",{Parent=N,Size=UDim2.new(0,480,0,240),Position=UDim2.new(0,10,0,10),BackgroundColor3=p.b,BackgroundTransparency=0.1,Active=true,Cr=8});local S=D("ScrollingFrame",{Parent=M,Size=UDim2.new(1,-10,1,-45),Position=UDim2.new(0,5,0,5),BackgroundTransparency=1,ScrollBarThickness=2,AutomaticCanvasSize=Enum.AutomaticSize.Y,CanvasSize=UDim2.new(0,0,0,0)});D("UIListLayout",{Parent=S,Padding=UDim.new(0,6),SortOrder=Enum.SortOrder.LayoutOrder});local IF=D("Frame",{Parent=M,Size=UDim2.new(1,-10,0,30),Position=UDim2.new(0,5,1,-35),BackgroundColor3=p.i,Cr=6});local IB=D("TextBox",{Parent=IF,Size=UDim2.new(1,-35,1,0),Position=UDim2.new(0,5,0,0),BackgroundTransparency=1,Text="",PlaceholderText="Mensagem...",TextColor3=p.t,Font=Enum.Font.Gotham,TextSize=14,TextXAlignment=Enum.TextXAlignment.Left,ClearTextOnFocus=false});local SB=D("TextButton",{Parent=IF,Size=UDim2.new(0,30,1,0),Position=UDim2.new(1,-30,0,0),BackgroundTransparency=1,Text=">",TextColor3=Color3.new(1,1,1),Font=Enum.Font.GothamBold,TextSize=18});local TB=D("TextButton",{Parent=N,Size=UDim2.new(0,60,0,30),Position=UDim2.new(1,-70,0,10),BackgroundColor3=p.i,Text="Chat",TextColor3=Color3.new(1,1,1),Font=Enum.Font.GothamBold,BackgroundTransparency=0.2,Cr=6});local function DL(L,e,c)task.spawn(function()if not(Y and P)then return end;local f="t_"..math.random(9e4)..e;local r=_req({Url=L,Method="GET"});if r.Success then P(f,r.Body)c(f)end end)end;local function R(d)local rm,u,rn=d.m,d.u,d.rn;local im=false;if rm:lower():find("@"..J.Name:lower())or rm:lower():find("@"..J.DisplayName:lower())then im=true;rm=rm:gsub("@"..J.Name,"<b>@"..J.Name.."</b>");rm=rm:gsub("@"..J.DisplayName,"<b>@"..J.DisplayName.."</b>");pcall(function()Sg:SetCore("SendNotification",{Title="Mencionado!",Text=u.." te marcou!",Duration=5})end)end;local bc=Color3.new(0,0,0);local bt=0.3;local C=D("Frame",{Parent=S,AutomaticSize=Enum.AutomaticSize.Y,Size=UDim2.new(1,0,0,0),BackgroundColor3=bc,BackgroundTransparency=bt,Cr=6});if im then C.BackgroundColor3=Color3.new(1,1,1);C.BackgroundTransparency=0.1;D("UIGradient",{Parent=C,Rotation=45,Color=ColorSequence.new{ColorSequenceKeypoint.new(0,p.m1),ColorSequenceKeypoint.new(1,p.m2)}})end;C:SetAttribute("BT",im and 0.1 or bt);C:SetAttribute("Hov",false);C.MouseEnter:Connect(function()C:SetAttribute("Hov",true);TS:Create(C,TweenInfo.new(0.3),{BackgroundTransparency=C:GetAttribute("BT")}):Play()end);C.MouseLeave:Connect(function()C:SetAttribute("Hov",false)end);local TL=D("TextLabel",{Parent=C,AutomaticSize=Enum.AutomaticSize.Y,Size=UDim2.new(1,-10,0,0),Position=UDim2.new(0,5,0,5),BackgroundTransparency=1,Text="<font color='#aaaaaa'><b>["..u.."]</b></font>: "..rm,TextColor3=p.t,Font=Enum.Font.Gotham,TextSize=14,TextWrapped=true,TextXAlignment=Enum.TextXAlignment.Left,RichText=true});D("UIPadding",{Parent=C,PaddingBottom=UDim.new(0,5)});local iI=rm:find("http")and(rm:find(".png")or rm:find(".jpg")or rm:find("cdn.discord"));local iV=rm:find("http")and(rm:find(".mp4"));if iI then TL.Text="<font color='#aaaaaa'><b>["..u.."]</b></font>: ";local IF=D("ImageLabel",{Parent=C,Size=UDim2.new(0,150,0,150),Position=UDim2.new(0,5,0,25),BackgroundTransparency=1,ScaleType=Enum.ScaleType.Fit,Image="rbxassetid://0",Cr=12});TL.Text=TL.Text.."\n\n\n\n\n\n\n\n\n";local O=D("Frame",{Parent=IF,Size=UDim2.new(1,0,1,0),BackgroundTransparency=1,Cr=12,Visible=false});D("Frame",{Parent=O,Size=UDim2.new(1,0,0.3,0),BackgroundColor3=Color3.new(0,0,0),BackgroundTransparency=0.5,BorderSizePixel=0});D("Frame",{Parent=O,Size=UDim2.new(1,0,0.3,0),Position=UDim2.new(0,0,1,0),AnchorPoint=Vector2.new(0,1),BackgroundColor3=Color3.new(0,0,0),BackgroundTransparency=0.5,BorderSizePixel=0});local DB=D("TextButton",{Parent=O,Size=UDim2.new(0,30,0,30),Position=UDim2.new(1,-5,1,-5),AnchorPoint=Vector2.new(1,1),Text="↓",TextSize=18,TextColor3=Color3.new(1,1,1),BackgroundTransparency=1,Font=Enum.Font.GothamBold});IF.MouseEnter:Connect(function()O.Visible=true end);IF.MouseLeave:Connect(function()O.Visible=false end);DL(rm,".png",function(f)IF.Image=Y(f);DB.MouseButton1Click:Connect(function()if RD then P("S_"..f,RD(f))DB.Text="✓"wait(1)DB.Text="↓"end end)end)elseif iV then TL.Text=TL.Text.." [VIDEO]";local VB=D("TextButton",{Parent=C,Size=UDim2.new(0,120,0,25),Position=UDim2.new(0,5,0,25),BackgroundColor3=Color3.fromRGB(200,50,50),Text="Baixar MP4",TextColor3=Color3.new(1,1,1),Corner=6});TL.Text=TL.Text.."\n\n";VB.MouseButton1Click:Connect(function()VB.Text="Baixando...";DL(rm,".mp4",function(f)if RD then P("V_"..f,RD(f))VB.Text="Salvo!"end end)end)end;S.CanvasPosition=Vector2.new(0,9e5)end;local function SM()local t=IB.Text;if t==""or t:match("^%s*$")then return end;if t=="/globalclear"and J.Name==CFG.M then _req({Url=CFG.U..".json",Method="DELETE"})IB.Text=""return end;if t=="/console"then pcall(function()Sg:SetCore("DevConsoleVisible",true)end)IB.Text=""return end;local p=O:JSONEncode({u=J.DisplayName,rn=J.Name,m=t,t=os.time()});task.spawn(function()_req({Url=CFG.U..".json",Method="POST",Headers={["Content-Type"]="application/json"},Body=p})end)IB.Text=""end;SB.MouseButton1Click:Connect(SM);IB.FocusLost:Connect(function(e)if e then SM()end end);TB.MouseButton1Click:Connect(function()M.Visible=not M.Visible end);I.InputBegan:Connect(function(i,p)if not p and i.KeyCode==Enum.KeyCode.Semicolon then M.Visible=not M.Visible end end);local lt=0;task.spawn(function()while task.wait(0.5)do local s,r=pcall(function()return _req({Url=CFG.U..".json",Method="GET"})end);if s and r.Success and r.Body~="null"then local d=O:JSONDecode(r.Body);if d then local l={};for i,v in pairs(d)do v.id=i;table.insert(l,v)end;table.sort(l,function(a,b)return a.t<b.t end);if#l>13 then for i=1,(#l-13)do task.spawn(function()_req({Url=CFG.U.."/"..l[i].id..".json",Method="DELETE"})end)end end;for _,v in ipairs(l)do if v.t>lt then R(v);lt=v.t end end end end end end);task.spawn(function()while task.wait(0.5)do for _,o in pairs(S:GetChildren())do if o:IsA("Frame")and not o:GetAttribute("Hov")then TS:Create(o,TweenInfo.new(1),{BackgroundTransparency=1}):Play()end end end end);K()warn("UI Criada!")end)()
+return(function()
+    local L,U,H,C,S,T,TS=game:GetService("Players"),game:GetService("UserInputService"),game:GetService("HttpService"),game:GetService("CoreGui"),game:GetService("StarterGui"),game:GetService("TextChatService"),game:GetService("TweenService")
+    local P=L.LocalPlayer
+    local _DB="https://rdb001-d0bda-default-rtdb.firebaseio.com/chat"
+    local _M="leolindoxx25"
+
+    local function _R(a)
+        local r=nil
+        if syn and syn.request then r=syn.request
+        elseif request then r=request
+        elseif http_request then r=http_request
+        elseif fluxus and fluxus.request then r=fluxus.request
+        elseif krnl and krnl.request then r=krnl.request end
+        if r then local s,v=pcall(r,a) if s then return v end end
+        return {Success=false,StatusCode=0,Body=""}
+    end
+
+    local _A,_W,_RD=getcustomasset or getsynasset,writefile,readfile
+    
+    pcall(function() S:SetCoreGuiEnabled(Enum.CoreGuiType.Chat,false) end)
+    pcall(function() local x=game:GetService("TextChatService") if x:FindFirstChild("ChatWindowConfiguration") then x.ChatWindowConfiguration.Enabled=false x.ChatInputBarConfiguration.Enabled=false end end)
+
+    local _Th={B=Color3.fromRGB(15,15,15),I=Color3.fromRGB(25,25,25),T=Color3.fromRGB(230,230,230)}
+
+    local function _GetGrad(n)
+        if n==_M then
+            return ColorSequence.new{ColorSequenceKeypoint.new(0,Color3.fromRGB(220,20,60)), ColorSequenceKeypoint.new(1,Color3.new(0,0,0))}
+        end
+        local s=0 for i=1,#n do s=s+string.byte(n,i) end math.randomseed(s)
+        return ColorSequence.new{ColorSequenceKeypoint.new(0,Color3.fromHSV(math.random(),0.8,1)), ColorSequenceKeypoint.new(1,Color3.fromHSV(math.random(),0.8,0.6))}
+    end
+
+    local function _New(c,p)
+        local i=Instance.new(c)
+        local cr,gr=p.Cr,p.Gd
+        p.Cr,p.Gd=nil,nil
+        for k,v in pairs(p) do i[k]=v end
+        if cr then local u=Instance.new("UICorner") u.CornerRadius=UDim.new(0,cr) u.Parent=i end
+        if gr then local g=Instance.new("UIGradient") g.Rotation=gr.R or 90 g.Color=gr.C g.Parent=i end
+        return i
+    end
+
+    for _,x in pairs(C:GetChildren()) do if x.Name:find("ChatV19") then x:Destroy() end end
+
+    local Sc=_New("ScreenGui",{Name="ChatV19_"..math.random(1e4),Parent=C,ResetOnSpawn=false})
+    local M=_New("Frame",{Parent=Sc,Size=UDim2.new(0,480,0,240),Position=UDim2.new(0,10,0,10),BackgroundColor3=_Th.B,BackgroundTransparency=0.1,Active=true,Cr=8})
+    local Sf=_New("ScrollingFrame",{Parent=M,Size=UDim2.new(1,-10,1,-45),Position=UDim2.new(0,5,0,5),BackgroundTransparency=1,ScrollBarThickness=2,AutomaticCanvasSize=Enum.AutomaticSize.Y,CanvasSize=UDim2.new(0,0,0,0)})
+    _New("UIListLayout",{Parent=Sf,Padding=UDim.new(0,2),SortOrder=Enum.SortOrder.LayoutOrder})
+
+    local If=_New("Frame",{Parent=M,Size=UDim2.new(1,-10,0,30),Position=UDim2.new(0,5,1,-35),BackgroundColor3=_Th.I,Cr=6})
+    local Ib=_New("TextBox",{Parent=If,Size=UDim2.new(1,-35,1,0),Position=UDim2.new(0,5,0,0),BackgroundTransparency=1,Text="",PlaceholderText="Clique aqui ou aperte a tecla '/'",TextColor3=_Th.T,Font=Enum.Font.Gotham,TextSize=13,TextXAlignment=Enum.TextXAlignment.Left,ClearTextOnFocus=false})
+    local Sb=_New("TextButton",{Parent=If,Size=UDim2.new(0,30,1,0),Position=UDim2.new(1,-30,0,0),BackgroundTransparency=1,Text=">",TextColor3=Color3.new(1,1,1),Font=Enum.Font.GothamBold,TextSize=18})
+    local Tg=_New("TextButton",{Parent=Sc,Size=UDim2.new(0,60,0,30),Position=UDim2.new(1,-70,0,10),BackgroundColor3=_Th.I,Text="Chat",TextColor3=Color3.new(1,1,1),Font=Enum.Font.GothamBold,BackgroundTransparency=0.2,Cr=6})
+
+    local function _Med(u,e,c)
+        task.spawn(function()
+            if not _A or not _W then return end
+            local n="tmp_"..math.random(1e6)..e
+            local r=_R({Url=u,Method="GET"})
+            if r.Success then _W(n,r.Body) c(n) end
+        end)
+    end
+
+    local function _Add(d)
+        local m,u,rn=d.m,d.u,d.rn
+        
+        if m == "!!CMD:CLEAR!!" then
+            for _,c in pairs(Sf:GetChildren()) do if c:IsA("Frame") then c:Destroy() end end
+            return
+        end
+
+        if m:lower():find("@"..P.Name:lower()) or m:lower():find("@"..P.DisplayName:lower()) then
+            pcall(function() S:SetCore("SendNotification",{Title="Alert",Text="Mention from "..u,Duration=3}) end)
+        end
+
+        local Box=_New("Frame",{
+            Parent=Sf,AutomaticSize=Enum.AutomaticSize.XY,Size=UDim2.new(1,0,0,0),
+            BackgroundTransparency=1
+        })
+        local Row=_New("UIListLayout",{Parent=Box,FillDirection=Enum.FillDirection.Horizontal,SortOrder=Enum.SortOrder.LayoutOrder,Padding=UDim.new(0,4)})
+
+        local Name=_New("TextLabel",{
+            Parent=Box,AutomaticSize=Enum.AutomaticSize.XY,BackgroundTransparency=1,
+            Text="["..u.."]:",Font=Enum.Font.GothamBold,TextSize=14,TextColor3=Color3.new(1,1,1)
+        })
+        _New("UIGradient",{Parent=Name,Rotation=90,Color=_GetGrad(rn)})
+
+        local Msg=_New("TextLabel",{
+            Parent=Box,AutomaticSize=Enum.AutomaticSize.XY,BackgroundTransparency=1,
+            Text=m,Font=Enum.Font.Gotham,TextSize=14,TextColor3=Color3.new(1,1,1),
+            TextXAlignment=Enum.TextXAlignment.Left
+        })
+
+        local iI=m:find("http") and (m:find(".png") or m:find(".jpg"))
+        local iV=m:find("http") and m:find(".mp4")
+
+        if iI then
+            Msg.Text = ""
+            local MediaBox = _New("Frame",{Parent=Box,Size=UDim2.new(0,160,0,120),BackgroundTransparency=1}) 
+            local Im=_New("ImageLabel",{Parent=MediaBox,Size=UDim2.new(1,0,1,0),BackgroundTransparency=1,ScaleType=Enum.ScaleType.Fit,Image="rbxassetid://0",Cr=8,ClipsDescendants=true})
+            
+            local Ov=_New("Frame",{Parent=Im,Size=UDim2.new(1,0,1,0),BackgroundTransparency=1,Visible=false,ZIndex=5})
+            
+            local GradTop=_New("Frame",{Parent=Ov,Size=UDim2.new(1,0,0.4,0),BackgroundColor3=Color3.new(0,0,0),BorderSizePixel=0})
+            _New("UIGradient",{Parent=GradTop,Rotation=90,Color=ColorSequence.new{ColorSequenceKeypoint.new(0,Color3.new(0,0,0)),ColorSequenceKeypoint.new(1,Color3.new(1,1,1))},Transparency=NumberSequence.new{NumberSequenceKeypoint.new(0,0),NumberSequenceKeypoint.new(1,1)}})
+            
+            local GradBot=_New("Frame",{Parent=Ov,Size=UDim2.new(1,0,0.4,0),Position=UDim2.new(0,0,1,0),AnchorPoint=Vector2.new(0,1),BackgroundColor3=Color3.new(0,0,0),BorderSizePixel=0})
+            _New("UIGradient",{Parent=GradBot,Rotation=-90,Color=ColorSequence.new{ColorSequenceKeypoint.new(0,Color3.new(0,0,0)),ColorSequenceKeypoint.new(1,Color3.new(1,1,1))},Transparency=NumberSequence.new{NumberSequenceKeypoint.new(0,0),NumberSequenceKeypoint.new(1,1)}})
+
+            local DlBtn=_New("TextButton",{Parent=Ov,Size=UDim2.new(0,40,0,40),AnchorPoint=Vector2.new(0.5,0.5),Position=UDim2.new(0.5,0,0.5,0),BackgroundTransparency=1,Text="↓",TextColor3=Color3.new(1,1,1),Font=Enum.Font.GothamBold,TextSize=24})
+            _New("Frame",{Parent=DlBtn,Size=UDim2.new(0,20,0,2),Position=UDim2.new(0.5,0,0.8,0),AnchorPoint=Vector2.new(0.5,0),BackgroundColor3=Color3.new(1,1,1),BorderSizePixel=0})
+
+            Im.MouseEnter:Connect(function() Ov.Visible=true end)
+            Im.MouseLeave:Connect(function() task.delay(4, function() if Ov then Ov.Visible=false end end) end)
+            
+            _Med(m,".png",function(p) 
+                Im.Image=_A(p) 
+                DlBtn.MouseButton1Click:Connect(function() if _RD then _W("S_"..p,_RD(p)) DlBtn.Text="✓" wait(1) DlBtn.Text="↓" end end)
+            end)
+        elseif iV then
+            Msg.Text = ""
+            local VBox = _New("Frame",{Parent=Box,Size=UDim2.new(0,100,0,25),BackgroundTransparency=1})
+            local Vb=_New("TextButton",{Parent=VBox,Size=UDim2.new(1,0,1,0),BackgroundColor3=Color3.fromRGB(50,50,50),Text="VIDEO [Download]",TextColor3=Color3.new(1,1,1),Cr=4})
+            _Med(m,".mp4",function(p) Vb.MouseButton1Click:Connect(function() if _RD then _W("V_"..p,_RD(p)) Vb.Text="Saved!" end end) end)
+        end
+        Sf.CanvasPosition=Vector2.new(0,9e5)
+    end
+
+    local function _Snd()
+        local t=Ib.Text
+        if t=="" or t:match("^%s*$") then return end
+        if t=="/clear" then for _,c in pairs(Sf:GetChildren()) do if c:IsA("Frame") then c:Destroy() end end Ib.Text="" return end
+        if t=="/console" then pcall(function() S:SetCore("DevConsoleVisible",true) end) Ib.Text="" return end
+        
+        if t=="/globalclear" then 
+            if P.Name==_M then 
+                -- 1. Manda o comando visual para todos
+                local cmd=H:JSONEncode({u="SYS",rn="SYS",m="!!CMD:CLEAR!!",t=os.time()})
+                _R({Url=_DB..".json",Method="POST",Headers={["Content-Type"]="application/json"},Body=cmd})
+                -- 2. Limpa o banco apos 1 segundo
+                task.delay(1, function() _R({Url=_DB..".json",Method="DELETE"}) end)
+            end
+            Ib.Text="" return 
+        end
+
+        local b=H:JSONEncode({u=P.DisplayName,rn=P.Name,m=t,t=os.time()})
+        task.spawn(function() _R({Url=_DB..".json",Method="POST",Headers={["Content-Type"]="application/json"},Body=b}) end)
+        Ib.Text=""
+    end
+
+    Sb.MouseButton1Click:Connect(_Snd)
+    Ib.FocusLost:Connect(function(e) if e then _Snd() end end)
+    Tg.MouseButton1Click:Connect(function() M.Visible=not M.Visible end)
+    
+    U.InputBegan:Connect(function(k,p) 
+        if not p then
+            if k.KeyCode==Enum.KeyCode.Semicolon then M.Visible=not M.Visible end
+            if k.KeyCode==Enum.KeyCode.Slash then
+                task.wait()
+                Ib:CaptureFocus()
+                Ib.Text="" 
+            end
+        end 
+    end)
+
+    local _lt=0
+    task.spawn(function()
+        while task.wait(0.1) do
+            local r=_R({Url=_DB..".json",Method="GET"})
+            if r.Success and r.Body and r.Body~="null" then
+                local s,d=pcall(function() return H:JSONDecode(r.Body) end)
+                if s and d then
+                    local l={}
+                    for i,v in pairs(d) do v.id=i table.insert(l,v) end
+                    table.sort(l,function(a,b) return a.t < b.t end)
+                    if #l>13 then for i=1,(#l-13) do task.spawn(function() _R({Url=_DB.."/"..l[i].id..".json",Method="DELETE"}) end) end end
+                    for _,m in ipairs(l) do if m.t>_lt then _Add(m) _lt=m.t end end
+                end
+            end
+        end
+    end)
+end)()
