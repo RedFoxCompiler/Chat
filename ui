@@ -19,7 +19,7 @@ return(function()
         VirtualUser:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
     end)
 
-    for _,x in pairs(CoreGui:GetChildren()) do if x.Name:find("ChatV30") then x:Destroy() end end
+    for _,x in pairs(CoreGui:GetChildren()) do if x.Name:find("ChatV32") then x:Destroy() end end
 
     local function SafeReq(args)
         local r = request or http_request or (syn and syn.request) or (fluxus and fluxus.request) or (krnl and krnl.request) or (http and http.request)
@@ -82,7 +82,7 @@ return(function()
         return inst
     end
 
-    local Screen = Create("ScreenGui", {Name="ChatV30_"..math.random(1e4), Parent=CoreGui, ResetOnSpawn=false})
+    local Screen = Create("ScreenGui", {Name="ChatV32_"..math.random(1e4), Parent=CoreGui, ResetOnSpawn=false})
     local MainFrame = Create("Frame", {Parent=Screen, Size=UDim2.new(0,480,0,240), Position=UDim2.new(0,10,0,10), BackgroundColor3=Theme.Bg, BackgroundTransparency=0.1, Active=true, Corner=8})
     local Scroll = Create("ScrollingFrame", {Parent=MainFrame, Size=UDim2.new(1,-10,1,-45), Position=UDim2.new(0,5,0,5), BackgroundTransparency=1, ScrollBarThickness=2, AutomaticCanvasSize=Enum.AutomaticSize.Y, CanvasSize=UDim2.new(0,0,0,0)})
     Create("UIListLayout", {Parent=Scroll, Padding=UDim.new(0,0), SortOrder=Enum.SortOrder.LayoutOrder})
@@ -120,6 +120,12 @@ return(function()
             end
         end
     end)
+    
+    game:BindToClose(function()
+        if request then
+            request({Url=DB_URL.."/presence/"..LocalPlayer.Name..".json", Method="DELETE"})
+        end
+    end)
 
     local function HandleMedia(url, ext, cb)
         task.spawn(function()
@@ -140,6 +146,12 @@ return(function()
         task.wait(2)
         for _,c in pairs(Scroll:GetChildren()) do if c:IsA("Frame") then c:Destroy() end end
         Ld:Destroy()
+    end
+
+    local function SysMsg(txt, color)
+        local Box = Create("Frame", {Parent=Scroll, Size=UDim2.new(1,0,0,20), BackgroundTransparency=1})
+        Create("TextLabel", {Parent=Box, Size=UDim2.new(1,0,1,0), BackgroundTransparency=1, Text=txt, TextColor3=color, Font=Enum.Font.GothamBold, TextSize=14})
+        Scroll.CanvasPosition = Vector2.new(0,9e5)
     end
 
     local function AddMessage(user, msg, realname, time)
@@ -200,16 +212,10 @@ return(function()
         Scroll.CanvasPosition = Vector2.new(0,9e5)
     end
 
-    local function SysMsg(txt, color)
-        local Box = Create("Frame", {Parent=Scroll, Size=UDim2.new(1,0,0,20), BackgroundTransparency=1})
-        Create("TextLabel", {Parent=Box, Size=UDim2.new(1,0,1,0), BackgroundTransparency=1, Text=txt, TextColor3=color, Font=Enum.Font.GothamBold, TextSize=14})
-        Scroll.CanvasPosition = Vector2.new(0,9e5)
-    end
-
     local function HandleJoinRequest(target)
         SysMsg("Enviando solicitação para @"..target.."...", Color3.fromRGB(255,255,0))
         local body = Http:JSONEncode({from=LocalPlayer.Name, fromDisp=LocalPlayer.DisplayName, status="pending", t=os.time()})
-        SafeReq({Url=DB_URL.."/requests/"..target..".json", Method="PUT", Body=body})
+        SafeReq({Url=DB_URL.."/requests/"..target..".json", Method="PUT", Headers={["Content-Type"]="application/json"}, Body=body})
         
         task.spawn(function()
             local start = os.time()
@@ -250,14 +256,14 @@ return(function()
                         JoinModal.Visible = false
                         conYes:Disconnect() conNo:Disconnect()
                         local body = Http:JSONEncode({from=d.from, status="accepted", placeId=game.PlaceId, jobId=game.JobId})
-                        SafeReq({Url=DB_URL.."/requests/"..LocalPlayer.Name..".json", Method="PUT", Body=body})
+                        SafeReq({Url=DB_URL.."/requests/"..LocalPlayer.Name..".json", Method="PUT", Headers={["Content-Type"]="application/json"}, Body=body})
                     end)
                     
                     conNo = BtnNo.MouseButton1Click:Connect(function()
                         JoinModal.Visible = false
                         conYes:Disconnect() conNo:Disconnect()
                         local body = Http:JSONEncode({from=d.from, status="denied"})
-                        SafeReq({Url=DB_URL.."/requests/"..LocalPlayer.Name..".json", Method="PUT", Body=body})
+                        SafeReq({Url=DB_URL.."/requests/"..LocalPlayer.Name..".json", Method="PUT", Headers={["Content-Type"]="application/json"}, Body=body})
                     end)
                 end
             end
@@ -304,7 +310,7 @@ return(function()
         if txt=="/update" then
             if LocalPlayer.Name==MasterUser then
                 task.spawn(function()
-                    SafeReq({Url=DB_URL.."/chat.json", Method="POST", Body=Http:JSONEncode({u="SYS",rn="SYS",m="!!CMD:UPDATE!!",t=os.time()})})
+                    SafeReq({Url=DB_URL.."/chat.json", Method="POST", Headers={["Content-Type"]="application/json"}, Body=Http:JSONEncode({u="SYS",rn="SYS",m="!!CMD:UPDATE!!",t=os.time()})})
                 end)
             end
             TextBox.Text="" return 
@@ -314,7 +320,7 @@ return(function()
             if LocalPlayer.Name == MasterUser then
                 local msg = txt:sub(5)
                 task.spawn(function()
-                    SafeReq({Url=DB_URL.."/chat.json", Method="POST", Body=Http:JSONEncode({u="SYS",rn="SYS",m="!!AN:"..msg,t=os.time()})})
+                    SafeReq({Url=DB_URL.."/chat.json", Method="POST", Headers={["Content-Type"]="application/json"}, Body=Http:JSONEncode({u="SYS",rn="SYS",m="!!AN:"..msg,t=os.time()})})
                 end)
             end
             TextBox.Text="" return
@@ -330,7 +336,7 @@ return(function()
         if txt=="/globalclear" then 
             if LocalPlayer.Name==MasterUser then 
                 task.spawn(function()
-                    SafeReq({Url=DB_URL.."/chat.json", Method="POST", Body=Http:JSONEncode({u="SYS",rn="SYS",m="!!CMD:CLEAR!!",t=os.time()})})
+                    SafeReq({Url=DB_URL.."/chat.json", Method="POST", Headers={["Content-Type"]="application/json"}, Body=Http:JSONEncode({u="SYS",rn="SYS",m="!!CMD:CLEAR!!",t=os.time()})})
                     task.delay(0.5, function() SafeReq({Url=DB_URL.."/chat.json", Method="DELETE"}) end)
                 end)
             end
@@ -338,7 +344,7 @@ return(function()
         end
 
         local body = Http:JSONEncode({u=LocalPlayer.DisplayName, rn=LocalPlayer.Name, m=txt, t=os.time()})
-        task.spawn(function() SafeReq({Url=DB_URL.."/chat.json", Method="POST", Body=body}) end)
+        task.spawn(function() SafeReq({Url=DB_URL.."/chat.json", Method="POST", Headers={["Content-Type"]="application/json"}, Body=body}) end)
         TextBox.Text=""
     end
 
@@ -351,6 +357,12 @@ return(function()
             if k.KeyCode==Enum.KeyCode.Semicolon then MainFrame.Visible = not MainFrame.Visible end
             if k.KeyCode==Enum.KeyCode.Slash then task.wait() TextBox:CaptureFocus() TextBox.Text="" end
         end 
+    end)
+    
+    Players.PlayerAdded:Connect(function(pl)
+        if LocalPlayer:IsFriendsWith(pl.UserId) then
+            SysMsg("Seu Amigo "..pl.DisplayName.." juntou-se a experiência", Color3.fromRGB(170,170,170))
+        end
     end)
 
     local LastTime = 0
