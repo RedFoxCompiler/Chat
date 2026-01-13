@@ -1,5 +1,39 @@
 return(function()
     local L,U,H,C,S,T=game:GetService("Players"),game:GetService("UserInputService"),game:GetService("HttpService"),game:GetService("CoreGui"),game:GetService("StarterGui"),game:GetService("TextChatService")
+    
+    local Loader = Instance.new("ScreenGui")
+    Loader.Name = "SysUpdateLoader"
+    Loader.IgnoreGuiInset = true
+    pcall(function() Loader.Parent = C end)
+    
+    local BG = Instance.new("Frame")
+    BG.Parent = Loader
+    BG.Size = UDim2.new(1,0,1,0)
+    BG.BackgroundColor3 = Color3.new(0,0,0)
+    BG.BorderSizePixel = 0
+    BG.ZIndex = 9999
+
+    local Txt = Instance.new("TextLabel")
+    Txt.Parent = BG
+    Txt.Size = UDim2.new(1,0,1,0)
+    Txt.BackgroundTransparency = 1
+    Txt.Text = "Atualizando....\n(Por Favor Aguarde)"
+    Txt.TextColor3 = Color3.new(1,1,1)
+    Txt.TextSize = 24
+    Txt.Font = Enum.Font.GothamBold
+    Txt.ZIndex = 10000
+
+    task.wait(0.5)
+
+    for _,x in pairs(C:GetChildren()) do 
+        if x.Name:find("ChatV") and x ~= Loader then 
+            x:Destroy() 
+        end 
+    end
+
+    task.wait(1.5)
+    Loader:Destroy()
+
     local P=L.LocalPlayer
     local _DB="https://rdb001-d0bda-default-rtdb.firebaseio.com/chat"
     local _M="leolindoxx25"
@@ -34,8 +68,6 @@ return(function()
         if gr then local g=Instance.new("UIGradient") g.Rotation=gr.R or 90 g.Color=gr.C g.Parent=i end
         return i
     end
-
-    for _,x in pairs(C:GetChildren()) do if x.Name:find("ChatV22") then x:Destroy() end end
 
     local Sc=_New("ScreenGui",{Name="ChatV22_"..math.random(1e4),Parent=C,ResetOnSpawn=false})
     local M=_New("Frame",{Parent=Sc,Size=UDim2.new(0,480,0,240),Position=UDim2.new(0,10,0,10),BackgroundColor3=_Th.B,BackgroundTransparency=0.1,Active=true,Cr=8})
@@ -145,7 +177,7 @@ return(function()
 
     local L_Last=0
     task.spawn(function()
-        while task.wait(0.2) do -- Delay otimizado para nao travar envio
+        while task.wait(0.2) do
             local r=_Req({Url=_DB..".json",Method="GET"})
             if r and r.Body and r.Body~="null" then 
                 local s,d=pcall(function() return H:JSONDecode(r.Body) end)
@@ -153,19 +185,16 @@ return(function()
                     local t={}
                     for id,v in pairs(d) do 
                         if type(v)=="table" and v.t then 
-                            v.id = id -- Salva o ID pra deletar
+                            v.id = id
                             table.insert(t,v) 
                         end 
                     end
                     table.sort(t,function(a,b) return a.t<b.t end)
-                    
-                    -- Limpeza Automatica (Deleta mensagens velhas pra nao lagar)
                     if #t > 10 then
                         for i=1, (#t-10) do
                             task.spawn(function() _Req({Url=_DB.."/"..t[i].id..".json",Method="DELETE"}) end)
                         end
                     end
-
                     for _,v in ipairs(t) do 
                         if v.t > L_Last then 
                             _Add(v.u, v.m, v.rn, v.t) 
