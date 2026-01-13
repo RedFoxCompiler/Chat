@@ -10,7 +10,8 @@ task.spawn(function()
     local _Map={
         joy="😂",sob="😭",skull="💀",clown="🤡",heart="❤️",fire="🔥",thumb="👍",poop="💩",
         eyes="👀",check="✅",x="❌",moyai="🗿",angry="😡",scream="😱",party="🎉",
-        sunglasses="😎",nerd="🤓",flush="😳",pray="🙏",ok="👌",wink="😉",smirk="😏"
+        sunglasses="😎",nerd="🤓",flush="😳",pray="🙏",ok="👌",wink="😉",smirk="😏",
+        sigma="🗿",chad="🗿",sus="🤨",salute="🫡"
     }
     local _Snds={{N="Vine Boom",I="6366598993"},{N="Bruh",I="5043130694"},{N="Discord Pings",I="13500632650"},{N="SpongeBob Fail",I="130768297"},{N="Cricket",I="130776595"},{N="Oof",I="12222242"},{N="Windows Error",I="1547905141"},{N="FBI Open Up",I="3611384078"},{N="Sad Violin",I="295325852"},{N="Cartoon Run",I="9060662369"}}
 
@@ -48,7 +49,7 @@ task.spawn(function()
         return i
     end
 
-    local Sc=_New("ScreenGui",{Name="ChatV25_"..math.random(1e4),Parent=C,ResetOnSpawn=false})
+    local Sc=_New("ScreenGui",{Name="ChatV25_"..math.random(1e4),Parent=C,ResetOnSpawn=false,ZIndexBehavior=Enum.ZIndexBehavior.Sibling})
     local M=_New("Frame",{Parent=Sc,Size=UDim2.new(0,480,0,240),Position=UDim2.new(0,10,0,10),BackgroundColor3=_Th.B,BackgroundTransparency=0.1,Active=true,Cr=8})
     local Sf=_New("ScrollingFrame",{Parent=M,Size=UDim2.new(1,-10,1,-45),Position=UDim2.new(0,5,0,5),BackgroundTransparency=1,ScrollBarThickness=2,VerticalScrollBarInset=Enum.ScrollBarInset.None,AutomaticCanvasSize=Enum.AutomaticSize.Y,CanvasSize=UDim2.new(0,0,0,0)})
     _New("UIListLayout",{Parent=Sf,Padding=UDim.new(0,0),SortOrder=Enum.SortOrder.LayoutOrder})
@@ -59,7 +60,7 @@ task.spawn(function()
     local Sb=_New("TextButton",{Parent=If,Size=UDim2.new(0,30,1,0),Position=UDim2.new(1,-30,0,0),BackgroundTransparency=1,Text=">",TextColor3=Color3.new(1,1,1),Font=Enum.Font.GothamBold,TextSize=18})
     local Tg=_New("TextButton",{Parent=Sc,Size=UDim2.new(0,60,0,30),Position=UDim2.new(1,-70,0,10),BackgroundColor3=_Th.I,Text="Chat",TextColor3=Color3.new(1,1,1),Font=Enum.Font.GothamBold,BackgroundTransparency=0.2,Cr=6})
 
-    local SugF=_New("ScrollingFrame",{Parent=If,Size=UDim2.new(0,150,0,120),Position=UDim2.new(0,35,0,-125),BackgroundColor3=_Th.I,Visible=false,Cr=6,ScrollBarThickness=2,ZIndex=20})
+    local SugF=_New("ScrollingFrame",{Parent=M,Size=UDim2.new(0,150,0,120),Position=UDim2.new(0,40,1,-160),BackgroundColor3=Color3.fromRGB(30,30,30),Visible=false,Cr=6,ScrollBarThickness=2,ZIndex=20,AutomaticCanvasSize=Enum.AutomaticSize.Y,CanvasSize=UDim2.new(0,0,0,0)})
     _New("UIListLayout",{Parent=SugF,Padding=UDim.new(0,2)})
 
     local Ctx=_New("Frame",{Parent=Sc,Size=UDim2.new(0,220,0,240),Position=UDim2.new(0,50,0,50),BackgroundColor3=Color3.fromRGB(25,25,25),Visible=false,Cr=6,ZIndex=50})
@@ -67,9 +68,11 @@ task.spawn(function()
     local TabE=_New("TextButton",{Parent=CtxTab,Size=UDim2.new(0.33,0,1,0),BackgroundTransparency=1,Text="Emo",TextColor3=Color3.new(1,1,1),Font=Enum.Font.GothamBold})
     local TabS=_New("TextButton",{Parent=CtxTab,Size=UDim2.new(0.33,0,1,0),Position=UDim2.new(0.33,0,0,0),BackgroundTransparency=1,Text="Snd",TextColor3=Color3.fromRGB(150,150,150),Font=Enum.Font.GothamBold})
     local TabU=_New("TextButton",{Parent=CtxTab,Size=UDim2.new(0.33,0,1,0),Position=UDim2.new(0.66,0,0,0),BackgroundTransparency=1,Text="User",TextColor3=Color3.fromRGB(150,150,150),Font=Enum.Font.GothamBold})
+    
     local PgE=_New("ScrollingFrame",{Parent=Ctx,Size=UDim2.new(1,-10,1,-40),Position=UDim2.new(0,5,0,35),BackgroundTransparency=1,ScrollBarThickness=2,CanvasSize=UDim2.new(0,0,0,0),AutomaticCanvasSize=Enum.AutomaticSize.Y})
     local PgS=_New("ScrollingFrame",{Parent=Ctx,Size=UDim2.new(1,-10,1,-40),Position=UDim2.new(0,5,0,35),BackgroundTransparency=1,ScrollBarThickness=2,CanvasSize=UDim2.new(0,0,0,0),AutomaticCanvasSize=Enum.AutomaticSize.Y,Visible=false})
     local PgU=_New("ScrollingFrame",{Parent=Ctx,Size=UDim2.new(1,-10,1,-40),Position=UDim2.new(0,5,0,35),BackgroundTransparency=1,ScrollBarThickness=2,CanvasSize=UDim2.new(0,0,0,0),AutomaticCanvasSize=Enum.AutomaticSize.Y,Visible=false})
+    
     _New("UIGridLayout",{Parent=PgE,CellSize=UDim2.new(0,40,0,40),CellPadding=UDim2.new(0,5,0,5)})
     _New("UIListLayout",{Parent=PgS,Padding=UDim.new(0,2)})
     _New("UIListLayout",{Parent=PgU,Padding=UDim.new(0,2)})
@@ -103,20 +106,20 @@ task.spawn(function()
         end)
     end
 
-    TabE.MouseButton1Click:Connect(function() PgE.Visible=true PgS.Visible=false PgU.Visible=false end)
-    TabS.MouseButton1Click:Connect(function() PgE.Visible=false PgS.Visible=true PgU.Visible=false end)
-    TabU.MouseButton1Click:Connect(function() PgE.Visible=false PgS.Visible=false PgU.Visible=true _UpdUsers() end)
-    BtnPlus.MouseButton1Click:Connect(function() Ctx.Visible = not Ctx.Visible end)
+    TabE.MouseButton1Click:Connect(function() PgE.Visible=true PgS.Visible=false PgU.Visible=false TabE.TextColor3=Color3.new(1,1,1) TabS.TextColor3=Color3.fromRGB(150,150,150) TabU.TextColor3=Color3.fromRGB(150,150,150) end)
+    TabS.MouseButton1Click:Connect(function() PgE.Visible=false PgS.Visible=true PgU.Visible=false TabS.TextColor3=Color3.new(1,1,1) TabE.TextColor3=Color3.fromRGB(150,150,150) TabU.TextColor3=Color3.fromRGB(150,150,150) end)
+    TabU.MouseButton1Click:Connect(function() PgE.Visible=false PgS.Visible=false PgU.Visible=true TabU.TextColor3=Color3.new(1,1,1) TabE.TextColor3=Color3.fromRGB(150,150,150) TabS.TextColor3=Color3.fromRGB(150,150,150) _UpdUsers() end)
+    BtnPlus.MouseButton1Click:Connect(function() Ctx.Visible = not Ctx.Visible if Ctx.Visible then PgE.Visible=true PgS.Visible=false PgU.Visible=false end end)
 
     Ib:GetPropertyChangedSignal("Text"):Connect(function()
         local txt = Ib.Text
-        local match = txt:match(":(%w+)$")
+        local match = txt:match(":(%w*)$")
         for _,c in pairs(SugF:GetChildren()) do if c:IsA("TextButton") then c:Destroy() end end
         if match then
             SugF.Visible = true
             local count = 0
             for k,v in pairs(_Map) do
-                if k:sub(1,#match) == match then
+                if k:sub(1,#match) == match:lower() then
                     count = count + 1
                     local b = _New("TextButton",{Parent=SugF,Size=UDim2.new(1,0,0,25),BackgroundColor3=Color3.fromRGB(50,50,50),Text=v.." :"..k,TextColor3=Color3.new(1,1,1),Font=Enum.Font.Gotham})
                     b.MouseButton1Click:Connect(function() Ib.Text = txt:gsub(":"..match.."$", ":"..k..": ") Ib:CaptureFocus() SugF.Visible=false end)
