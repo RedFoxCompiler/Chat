@@ -4,7 +4,7 @@ return(function()
     local _DB="https://rdb001-d0bda-default-rtdb.firebaseio.com"
     local _M="leolindoxx25"
 
-    for _,x in pairs(C:GetChildren()) do if x.Name:find("ChatV26") then x:Destroy() end end
+    for _,x in pairs(C:GetChildren()) do if x.Name:find("ChatV27") then x:Destroy() end end
 
     local function _Req(a)
         local r=request or http_request or (syn and syn.request) or (fluxus and fluxus.request) or (krnl and krnl.request) or (http and http.request)
@@ -53,7 +53,7 @@ return(function()
         return i
     end
 
-    local Sc=_New("ScreenGui",{Name="ChatV26_"..math.random(1e4),Parent=C,ResetOnSpawn=false})
+    local Sc=_New("ScreenGui",{Name="ChatV27_"..math.random(1e4),Parent=C,ResetOnSpawn=false})
     local M=_New("Frame",{Parent=Sc,Size=UDim2.new(0,480,0,240),Position=UDim2.new(0,10,0,10),BackgroundColor3=_Th.B,BackgroundTransparency=0.1,Active=true,Cr=8})
     local Sf=_New("ScrollingFrame",{Parent=M,Size=UDim2.new(1,-10,1,-45),Position=UDim2.new(0,5,0,5),BackgroundTransparency=1,ScrollBarThickness=2,AutomaticCanvasSize=Enum.AutomaticSize.Y,CanvasSize=UDim2.new(0,0,0,0)})
     _New("UIListLayout",{Parent=Sf,Padding=UDim.new(0,0),SortOrder=Enum.SortOrder.LayoutOrder})
@@ -101,10 +101,22 @@ return(function()
         end)
     end
 
+    local function _Update()
+        local Loader = Instance.new("ScreenGui")
+        Loader.Name = "UpdateScreen"
+        Loader.IgnoreGuiInset = true
+        Loader.Parent = C
+        local BG = Instance.new("Frame", {Parent=Loader,Size=UDim2.new(1,0,1,0),BackgroundColor3=Color3.new(0,0,0),ZIndex=9999})
+        _New("TextLabel",{Parent=BG,Size=UDim2.new(1,0,1,0),BackgroundTransparency=1,Text="Atualizando....\n(Por Favor Aguarde)",TextColor3=Color3.new(1,1,1),TextSize=24,Font=Enum.Font.GothamBold,ZIndex=10000})
+        task.wait(2)
+        for _,c in pairs(Sf:GetChildren()) do if c:IsA("Frame") then c:Destroy() end end
+        Loader:Destroy()
+    end
+
     local function _Add(u, m, rn, t)
         rn = rn or u
         if m=="!!CMD:CLEAR!!" then for _,c in pairs(Sf:GetChildren()) do if c:IsA("Frame") then c:Destroy() end end return end
-        if m=="!!CMD:UPDATE!!" then return end
+        if m=="!!CMD:UPDATE!!" then _Update() return end
 
         if m:lower():find("@"..P.Name:lower()) or m:lower():find("@"..P.DisplayName:lower()) then
             pcall(function() S:SetCore("SendNotification",{Title="Alert",Text="Mention from "..u,Duration=3}) end)
@@ -237,18 +249,6 @@ return(function()
         end
     end)
 
-    local function _Update()
-        local Loader = Instance.new("ScreenGui")
-        Loader.Name = "UpdateScreen"
-        Loader.IgnoreGuiInset = true
-        Loader.Parent = C
-        local BG = Instance.new("Frame", {Parent=Loader,Size=UDim2.new(1,0,1,0),BackgroundColor3=Color3.new(0,0,0),ZIndex=9999})
-        _New("TextLabel",{Parent=BG,Size=UDim2.new(1,0,1,0),BackgroundTransparency=1,Text="Atualizando....\n(Por Favor Aguarde)",TextColor3=Color3.new(1,1,1),TextSize=24,Font=Enum.Font.GothamBold,ZIndex=10000})
-        task.wait(2)
-        for _,c in pairs(Sf:GetChildren()) do if c:IsA("Frame") then c:Destroy() end end
-        Loader:Destroy()
-    end
-
     local function _Snd()
         local t=Ib.Text
         if t=="" or #t>300 then return end
@@ -260,7 +260,6 @@ return(function()
             if P.Name==_M then
                 task.spawn(function()
                     _Req({Url=_DB.."/chat.json",Method="POST",Body=H:JSONEncode({u="SYS",rn="SYS",m="!!CMD:UPDATE!!",t=os.time()})})
-                    task.wait(1) _Req({Url=_DB.."/chat.json",Method="DELETE"})
                 end)
             end
             Ib.Text="" return 
