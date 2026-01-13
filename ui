@@ -1,20 +1,28 @@
 return(function()
     local L,U,H,C,S,T=game:GetService("Players"),game:GetService("UserInputService"),game:GetService("HttpService"),game:GetService("CoreGui"),game:GetService("StarterGui"),game:GetService("TextChatService")
     local P=L.LocalPlayer
+    
+    -- URL BASE (A logica antiga adiciona .json depois)
     local _DB="https://rdb001-d0bda-default-rtdb.firebaseio.com/chat"
     local _M="leolindoxx25"
 
+    -- SELETOR DE REQUEST (Igual ao antigo, mas expandido para garantir)
     local function _Req(a)
-        local r=request or http_request or (syn and syn.request) or (fluxus and fluxus.request) or (krnl and krnl.request)
-        if r then local s,v=pcall(r,a) if s then return v end end
+        local r=request or http_request or (syn and syn.request) or (fluxus and fluxus.request) or (krnl and krnl.request) or (http and http.request)
+        if r then 
+            local s,v=pcall(r,a) 
+            if s then return v end 
+        end
         return nil
     end
 
     local _A,_W,_RD=getcustomasset or getsynasset,writefile,readfile
     
+    -- Desativa Chat Original
     pcall(function() S:SetCoreGuiEnabled(Enum.CoreGuiType.Chat,false) end)
     pcall(function() local x=game:GetService("TextChatService") if x:FindFirstChild("ChatWindowConfiguration") then x.ChatWindowConfiguration.Enabled=false x.ChatInputBarConfiguration.Enabled=false end end)
 
+    -- Temas e Cores
     local _Th={B=Color3.fromRGB(15,15,15),I=Color3.fromRGB(25,25,25),T=Color3.fromRGB(230,230,230)}
 
     local function _GetGrad(n)
@@ -25,6 +33,7 @@ return(function()
         return ColorSequence.new{ColorSequenceKeypoint.new(0,Color3.fromHSV(math.random(),0.8,1)), ColorSequenceKeypoint.new(1,Color3.fromHSV(math.random(),0.8,0.6))}
     end
 
+    -- Construtor de UI
     local function _New(c,p)
         local i=Instance.new(c)
         local cr,gr=p.Cr,p.Gd
@@ -35,9 +44,11 @@ return(function()
         return i
     end
 
-    for _,x in pairs(C:GetChildren()) do if x.Name:find("ChatV20") then x:Destroy() end end
+    -- Limpeza de UI Anterior
+    for _,x in pairs(C:GetChildren()) do if x.Name:find("ChatV21") then x:Destroy() end end
 
-    local Sc=_New("ScreenGui",{Name="ChatV20_"..math.random(1e4),Parent=C,ResetOnSpawn=false})
+    -- GUI Principal
+    local Sc=_New("ScreenGui",{Name="ChatV21_"..math.random(1e4),Parent=C,ResetOnSpawn=false})
     local M=_New("Frame",{Parent=Sc,Size=UDim2.new(0,480,0,240),Position=UDim2.new(0,10,0,10),BackgroundColor3=_Th.B,BackgroundTransparency=0.1,Active=true,Cr=8})
     local Sf=_New("ScrollingFrame",{Parent=M,Size=UDim2.new(1,-10,1,-45),Position=UDim2.new(0,5,0,5),BackgroundTransparency=1,ScrollBarThickness=2,AutomaticCanvasSize=Enum.AutomaticSize.Y,CanvasSize=UDim2.new(0,0,0,0)})
     _New("UIListLayout",{Parent=Sf,Padding=UDim.new(0,0),SortOrder=Enum.SortOrder.LayoutOrder})
@@ -47,6 +58,7 @@ return(function()
     local Sb=_New("TextButton",{Parent=If,Size=UDim2.new(0,30,1,0),Position=UDim2.new(1,-30,0,0),BackgroundTransparency=1,Text=">",TextColor3=Color3.new(1,1,1),Font=Enum.Font.GothamBold,TextSize=18})
     local Tg=_New("TextButton",{Parent=Sc,Size=UDim2.new(0,60,0,30),Position=UDim2.new(1,-70,0,10),BackgroundColor3=_Th.I,Text="Chat",TextColor3=Color3.new(1,1,1),Font=Enum.Font.GothamBold,BackgroundTransparency=0.2,Cr=6})
 
+    -- Funcao de Download (Media)
     local function _Med(u,e,c)
         task.spawn(function()
             if not _A or not _W then return end
@@ -56,8 +68,10 @@ return(function()
         end)
     end
 
-    local function _Add(d)
-        local m,u,rn=d.m,d.u,d.rn
+    -- Renderizador de Mensagem (Visual da V19)
+    local function _Add(u, m, rn, t)
+        -- Compatibilidade: Se nao tiver rn (RealName), usa o u (User)
+        rn = rn or u
         
         if m == "!!CMD:CLEAR!!" then
             for _,c in pairs(Sf:GetChildren()) do if c:IsA("Frame") then c:Destroy() end end
@@ -78,7 +92,7 @@ return(function()
             Parent=Box,AutomaticSize=Enum.AutomaticSize.XY,BackgroundTransparency=1,
             Text="["..u.."]:",Font=Enum.Font.GothamBold,TextSize=14,TextColor3=Color3.new(1,1,1)
         })
-        _New("UIGradient",{Parent=Name,Rotation=90,Color=_GetGrad(rn or u)})
+        _New("UIGradient",{Parent=Name,Rotation=90,Color=_GetGrad(rn)})
 
         local Msg=_New("TextLabel",{
             Parent=Box,AutomaticSize=Enum.AutomaticSize.XY,BackgroundTransparency=1,
@@ -95,13 +109,10 @@ return(function()
             local Im=_New("ImageLabel",{Parent=MediaBox,Size=UDim2.new(1,0,1,0),BackgroundTransparency=1,ScaleType=Enum.ScaleType.Fit,Image="rbxassetid://0",Cr=8,ClipsDescendants=true})
             
             local Ov=_New("Frame",{Parent=Im,Size=UDim2.new(1,0,1,0),BackgroundTransparency=1,Visible=false,ZIndex=5})
-            
             local GradTop=_New("Frame",{Parent=Ov,Size=UDim2.new(1,0,0.4,0),BackgroundColor3=Color3.new(0,0,0),BorderSizePixel=0})
             _New("UIGradient",{Parent=GradTop,Rotation=90,Color=ColorSequence.new{ColorSequenceKeypoint.new(0,Color3.new(0,0,0)),ColorSequenceKeypoint.new(1,Color3.new(1,1,1))},Transparency=NumberSequence.new{NumberSequenceKeypoint.new(0,0),NumberSequenceKeypoint.new(1,1)}})
-            
             local GradBot=_New("Frame",{Parent=Ov,Size=UDim2.new(1,0,0.4,0),Position=UDim2.new(0,0,1,0),AnchorPoint=Vector2.new(0,1),BackgroundColor3=Color3.new(0,0,0),BorderSizePixel=0})
             _New("UIGradient",{Parent=GradBot,Rotation=-90,Color=ColorSequence.new{ColorSequenceKeypoint.new(0,Color3.new(0,0,0)),ColorSequenceKeypoint.new(1,Color3.new(1,1,1))},Transparency=NumberSequence.new{NumberSequenceKeypoint.new(0,0),NumberSequenceKeypoint.new(1,1)}})
-
             local DlBtn=_New("TextButton",{Parent=Ov,Size=UDim2.new(0,40,0,40),AnchorPoint=Vector2.new(0.5,0.5),Position=UDim2.new(0.5,0,0.5,0),BackgroundTransparency=1,Text="↓",TextColor3=Color3.new(1,1,1),Font=Enum.Font.GothamBold,TextSize=24})
             _New("Frame",{Parent=DlBtn,Size=UDim2.new(0,20,0,2),Position=UDim2.new(0.5,0,0.8,0),AnchorPoint=Vector2.new(0.5,0),BackgroundColor3=Color3.new(1,1,1),BorderSizePixel=0})
 
@@ -118,18 +129,18 @@ return(function()
             local Vb=_New("TextButton",{Parent=VBox,Size=UDim2.new(1,0,1,0),BackgroundColor3=Color3.fromRGB(50,50,50),Text="VIDEO [Download]",TextColor3=Color3.new(1,1,1),Cr=4})
             _Med(m,".mp4",function(p) Vb.MouseButton1Click:Connect(function() if _RD then _W("V_"..p,_RD(p)) Vb.Text="Saved!" end end) end)
         end
-        task.wait()
         Sf.CanvasPosition=Vector2.new(0,9e5)
     end
 
+    -- Funcao de Envio (Logica do Antigo)
     local function _Snd()
-        local t=Ib.Text
-        if t=="" or #t>300 then return end
-        
-        if t=="/clear" then for _,c in pairs(Sf:GetChildren()) do if c:IsA("Frame") then c:Destroy() end end Ib.Text="" return end
-        if t=="/console" then pcall(function() S:SetCore("DevConsoleVisible",true) end) Ib.Text="" return end
-        
-        if t=="/globalclear" then 
+        local msg = Ib.Text
+        if msg=="" or #msg>300 then return end
+
+        if msg=="/clear" then for _,c in pairs(Sf:GetChildren()) do if c:IsA("Frame") then c:Destroy() end end Ib.Text="" return end
+        if msg=="/console" then pcall(function() S:SetCore("DevConsoleVisible",true) end) Ib.Text="" return end
+
+        if msg=="/globalclear" then 
             if P.Name==_M then 
                 local cmd=H:JSONEncode({u="SYS",rn="SYS",m="!!CMD:CLEAR!!",t=os.time()})
                 _Req({Url=_DB..".json",Method="POST",Headers={["Content-Type"]="application/json"},Body=cmd})
@@ -138,7 +149,7 @@ return(function()
             Ib.Text="" return 
         end
 
-        local p=H:JSONEncode({u=P.DisplayName,rn=P.Name,m=t,t=os.time()})
+        local p=H:JSONEncode({["u"]=P.DisplayName,["rn"]=P.Name,["m"]=msg,["t"]=os.time()})
         _Req({Url=_DB..".json",Method="POST",Headers={["Content-Type"]="application/json"},Body=p})
         Ib.Text=""
     end
@@ -146,38 +157,41 @@ return(function()
     Sb.MouseButton1Click:Connect(_Snd)
     Ib.FocusLost:Connect(function(e) if e then _Snd() end end)
     Tg.MouseButton1Click:Connect(function() M.Visible=not M.Visible end)
-    
     U.InputBegan:Connect(function(k,p) 
         if not p then
             if k.KeyCode==Enum.KeyCode.Semicolon then M.Visible=not M.Visible end
-            if k.KeyCode==Enum.KeyCode.Slash then
-                task.wait()
-                Ib:CaptureFocus()
-                Ib.Text="" 
-            end
+            if k.KeyCode==Enum.KeyCode.Slash then task.wait() Ib:CaptureFocus() Ib.Text="" end
         end 
     end)
 
-    local _lt=0
+    -- LOGICA DE LOOP DO SCRIPT ANTIGO (Exatamente igual)
+    local L_Last=0
     task.spawn(function()
-        while task.wait(0.5) do
-            local r=_Req({Url=_DB..".json",Method="GET"})
-            if r and r.Body and r.Body~="null" then
-                local s,d=pcall(function() return H:JSONDecode(r.Body) end)
-                if s and d then
-                    local t={}
-                    for _,v in pairs(d) do 
-                        if type(v)=="table" and v.t then table.insert(t,v) end 
-                    end
-                    table.sort(t,function(a,b) return a.t < b.t end)
-                    for _,v in ipairs(t) do 
-                        if v.t>_lt then 
-                            _Add(v) 
-                            _lt=v.t 
-                        end 
-                    end
+        while task.wait() do 
+            local s,r=pcall(function() return _Req({Url=_DB..".json",Method="GET"}) end)
+            if s and r and r.Body and r.Body~="null" then 
+                local d=H:JSONDecode(r.Body)
+                local t={}
+                for _,v in pairs(d) do 
+                    if type(v)=="table" and v.t then 
+                        table.insert(t,v) 
+                    end 
                 end
-            end
-        end
+                table.sort(t,function(a,b) return a.t<b.t end)
+                
+                -- Limpeza automatica (Logica Extra da V20)
+                if #t > 15 then 
+                   -- Opcional: deletar antigos para nao lagar
+                end
+
+                for _,v in ipairs(t) do 
+                    if v.t > L_Last then 
+                        -- Aqui chama a UI nova com os dados antigos
+                        _Add(v.u, v.m, v.rn, v.t) 
+                        L_Last=v.t 
+                    end 
+                end 
+            end 
+        end 
     end)
 end)()
