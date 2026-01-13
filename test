@@ -4,8 +4,8 @@ task.spawn(function()
     local _DB="https://rdb001-d0bda-default-rtdb.firebaseio.com/chat"
     local _M="leolindoxx25"
     local _LT=0
-    local _LM=""
     local _AFK=false
+    local _Target=nil
 
     local _Map={
         joy="😂",sob="😭",skull="💀",clown="🤡",heart="❤️",fire="🔥",thumb="👍",poop="💩",
@@ -13,7 +13,6 @@ task.spawn(function()
         sunglasses="😎",nerd="🤓",flush="😳",pray="🙏",ok="👌",wink="😉",smirk="😏",
         sigma="🗿",chad="🗿",sus="🤨",salute="🫡"
     }
-    local _Snds={{N="Vine Boom",I="6366598993"},{N="Bruh",I="5043130694"},{N="Discord Pings",I="13500632650"},{N="SpongeBob Fail",I="130768297"},{N="Cricket",I="130776595"},{N="Oof",I="12222242"},{N="Windows Error",I="1547905141"},{N="FBI Open Up",I="3611384078"},{N="Sad Violin",I="295325852"},{N="Cartoon Run",I="9060662369"}}
 
     for _,x in pairs(C:GetChildren()) do if x.Name:find("ChatV25") then x:Destroy() end end
 
@@ -63,23 +62,23 @@ task.spawn(function()
     local SugF=_New("ScrollingFrame",{Parent=M,Size=UDim2.new(0,150,0,120),Position=UDim2.new(0,40,1,-160),BackgroundColor3=Color3.fromRGB(30,30,30),Visible=false,Cr=6,ScrollBarThickness=2,ZIndex=20,AutomaticCanvasSize=Enum.AutomaticSize.Y,CanvasSize=UDim2.new(0,0,0,0)})
     _New("UIListLayout",{Parent=SugF,Padding=UDim.new(0,2)})
 
-    local Ctx=_New("Frame",{Parent=Sc,Size=UDim2.new(0,220,0,240),Position=UDim2.new(0,50,0,50),BackgroundColor3=Color3.fromRGB(25,25,25),Visible=false,Cr=6,ZIndex=50})
+    local Ctx=_New("Frame",{Parent=Sc,Size=UDim2.new(0,220,0,200),Position=UDim2.new(0,50,0,50),BackgroundColor3=Color3.fromRGB(25,25,25),Visible=false,Cr=6,ZIndex=50})
     local CtxTab=_New("Frame",{Parent=Ctx,Size=UDim2.new(1,0,0,30),BackgroundColor3=Color3.fromRGB(40,40,40),Cr=6})
-    local TabE=_New("TextButton",{Parent=CtxTab,Size=UDim2.new(0.33,0,1,0),BackgroundTransparency=1,Text="Emo",TextColor3=Color3.new(1,1,1),Font=Enum.Font.GothamBold})
-    local TabS=_New("TextButton",{Parent=CtxTab,Size=UDim2.new(0.33,0,1,0),Position=UDim2.new(0.33,0,0,0),BackgroundTransparency=1,Text="Snd",TextColor3=Color3.fromRGB(150,150,150),Font=Enum.Font.GothamBold})
-    local TabU=_New("TextButton",{Parent=CtxTab,Size=UDim2.new(0.33,0,1,0),Position=UDim2.new(0.66,0,0,0),BackgroundTransparency=1,Text="User",TextColor3=Color3.fromRGB(150,150,150),Font=Enum.Font.GothamBold})
+    local TabE=_New("TextButton",{Parent=CtxTab,Size=UDim2.new(0.5,0,1,0),BackgroundTransparency=1,Text="Reagir",TextColor3=Color3.new(1,1,1),Font=Enum.Font.GothamBold})
+    local TabU=_New("TextButton",{Parent=CtxTab,Size=UDim2.new(0.5,0,1,0),Position=UDim2.new(0.5,0,0,0),BackgroundTransparency=1,Text="Users",TextColor3=Color3.fromRGB(150,150,150),Font=Enum.Font.GothamBold})
     
     local PgE=_New("ScrollingFrame",{Parent=Ctx,Size=UDim2.new(1,-10,1,-40),Position=UDim2.new(0,5,0,35),BackgroundTransparency=1,ScrollBarThickness=2,CanvasSize=UDim2.new(0,0,0,0),AutomaticCanvasSize=Enum.AutomaticSize.Y})
-    local PgS=_New("ScrollingFrame",{Parent=Ctx,Size=UDim2.new(1,-10,1,-40),Position=UDim2.new(0,5,0,35),BackgroundTransparency=1,ScrollBarThickness=2,CanvasSize=UDim2.new(0,0,0,0),AutomaticCanvasSize=Enum.AutomaticSize.Y,Visible=false})
     local PgU=_New("ScrollingFrame",{Parent=Ctx,Size=UDim2.new(1,-10,1,-40),Position=UDim2.new(0,5,0,35),BackgroundTransparency=1,ScrollBarThickness=2,CanvasSize=UDim2.new(0,0,0,0),AutomaticCanvasSize=Enum.AutomaticSize.Y,Visible=false})
-    
     _New("UIGridLayout",{Parent=PgE,CellSize=UDim2.new(0,40,0,40),CellPadding=UDim2.new(0,5,0,5)})
-    _New("UIListLayout",{Parent=PgS,Padding=UDim.new(0,2)})
     _New("UIListLayout",{Parent=PgU,Padding=UDim.new(0,2)})
 
-    local function _SendRaw(m) task.spawn(function() _Req({Url=_DB..".json",Method="POST",Headers={["Content-Type"]="application/json"},Body=H:JSONEncode({["u"]=P.DisplayName,["rn"]=P.Name,["m"]=m,["t"]=os.time()})}) end) Ctx.Visible=false end
+    local function _SendRaw(m) 
+        if _Target then m = "> @".._Target..": "..m end
+        task.spawn(function() _Req({Url=_DB..".json",Method="POST",Headers={["Content-Type"]="application/json"},Body=H:JSONEncode({["u"]=P.DisplayName,["rn"]=P.Name,["m"]=m,["t"]=os.time()})}) end) 
+        Ctx.Visible=false _Target=nil
+    end
+    
     for k,v in pairs(_Map) do local b=_New("TextButton",{Parent=PgE,BackgroundColor3=Color3.fromRGB(50,50,50),Text=v,TextSize=20,Cr=4}) b.MouseButton1Click:Connect(function() _SendRaw(v) end) end
-    for _,s in pairs(_Snds) do local b=_New("TextButton",{Parent=PgS,Size=UDim2.new(1,0,0,30),BackgroundColor3=Color3.fromRGB(50,50,50),Text="🔊 "..s.N,TextColor3=Color3.new(1,1,1),Font=Enum.Font.Gotham,Cr=4}) b.MouseButton1Click:Connect(function() _SendRaw("!!SND:"..s.I.."!!") end) end
 
     local function _UpdUsers()
         for _,c in pairs(PgU:GetChildren()) do if c:IsA("Frame") then c:Destroy() end end
@@ -106,10 +105,9 @@ task.spawn(function()
         end)
     end
 
-    TabE.MouseButton1Click:Connect(function() PgE.Visible=true PgS.Visible=false PgU.Visible=false TabE.TextColor3=Color3.new(1,1,1) TabS.TextColor3=Color3.fromRGB(150,150,150) TabU.TextColor3=Color3.fromRGB(150,150,150) end)
-    TabS.MouseButton1Click:Connect(function() PgE.Visible=false PgS.Visible=true PgU.Visible=false TabS.TextColor3=Color3.new(1,1,1) TabE.TextColor3=Color3.fromRGB(150,150,150) TabU.TextColor3=Color3.fromRGB(150,150,150) end)
-    TabU.MouseButton1Click:Connect(function() PgE.Visible=false PgS.Visible=false PgU.Visible=true TabU.TextColor3=Color3.new(1,1,1) TabE.TextColor3=Color3.fromRGB(150,150,150) TabS.TextColor3=Color3.fromRGB(150,150,150) _UpdUsers() end)
-    BtnPlus.MouseButton1Click:Connect(function() Ctx.Visible = not Ctx.Visible if Ctx.Visible then PgE.Visible=true PgS.Visible=false PgU.Visible=false end end)
+    TabE.MouseButton1Click:Connect(function() PgE.Visible=true PgU.Visible=false TabE.TextColor3=Color3.new(1,1,1) TabU.TextColor3=Color3.fromRGB(150,150,150) end)
+    TabU.MouseButton1Click:Connect(function() PgE.Visible=false PgU.Visible=true TabU.TextColor3=Color3.new(1,1,1) TabE.TextColor3=Color3.fromRGB(150,150,150) _UpdUsers() end)
+    BtnPlus.MouseButton1Click:Connect(function() _Target=nil Ctx.Visible = not Ctx.Visible if Ctx.Visible then PgE.Visible=true PgU.Visible=false end end)
 
     Ib:GetPropertyChangedSignal("Text"):Connect(function()
         local txt = Ib.Text
@@ -169,20 +167,21 @@ task.spawn(function()
 
         local Msg=_New("TextLabel",{Parent=Box,AutomaticSize=Enum.AutomaticSize.XY,BackgroundTransparency=1,Text=fmtM,RichText=true,Font=Enum.Font.Gotham,TextSize=14,TextColor3=Color3.new(1,1,1),TextXAlignment=Enum.TextXAlignment.Left,TextWrapped=true})
 
+        Msg.InputBegan:Connect(function(i) 
+            if i.UserInputType==Enum.UserInputType.MouseButton2 then
+                _Target=u Ctx.Position=UDim2.new(0,U:GetMouse().X,0,U:GetMouse().Y) Ctx.Visible=true
+            elseif i.UserInputType==Enum.UserInputType.Touch then
+                local t0=tick() while U:IsMouseButtonPressed(Enum.UserInputType.Touch) do if tick()-t0>0.8 then _Target=u Ctx.Position=UDim2.new(0,U:GetMouse().X,0,U:GetMouse().Y) Ctx.Visible=true break end task.wait() end
+            end
+        end)
+
         local iI=m:find("http") and (m:find(".png") or m:find(".jpg"))
-        local iS=m:find("!!SND:")
         if iI then
             Msg.Text=""
             local MB=_New("Frame",{Parent=Box,Size=UDim2.new(0,160,0,120),BackgroundTransparency=1}) 
             local Lbl=_New("TextLabel",{Parent=MB,Size=UDim2.new(1,0,1,0),BackgroundTransparency=1,Text="...",TextColor3=Color3.new(1,1,1),Font=Enum.Font.Gotham})
             local Im=_New("ImageLabel",{Parent=MB,Size=UDim2.new(1,0,1,0),BackgroundTransparency=1,ScaleType=Enum.ScaleType.Fit,ResampleMode=Enum.ResamplerMode.Default,Image="",Cr=8})
             _Med(m,".png",Lbl,function(p) Im.Image=_A(p) end)
-        elseif iS then
-            Msg.Text=""
-            local sid=m:match("!!SND:(%d+)!!")
-            local V=_New("Frame",{Parent=Box,Size=UDim2.new(0,100,0,30),BackgroundTransparency=1})
-            local b=_New("TextButton",{Parent=V,Size=UDim2.new(1,0,1,0),BackgroundColor3=Color3.fromRGB(60,60,100),Text="🔊 Tocar",TextColor3=Color3.new(1,1,1),Font=Enum.Font.GothamBold,Cr=4})
-            b.MouseButton1Click:Connect(function() local s=Instance.new("Sound",workspace) s.SoundId="rbxassetid://"..sid s.Volume=2 s:Play() s.Ended:Connect(function() s:Destroy() end) end)
         elseif m:find("http") and m:find(".mp4") then
             Msg.Text=""
             local V=_New("Frame",{Parent=Box,Size=UDim2.new(0,120,0,30),BackgroundTransparency=1})
@@ -198,7 +197,7 @@ task.spawn(function()
         Ib.Text="" SugF.Visible=false
         
         if msg=="/clear" then for _,c in pairs(Sf:GetChildren()) do if c:IsA("Frame") then c:Destroy() end end Ib:ReleaseFocus() return end
-        if msg=="/afk" then _AFK=not _AFK _Add("SYS", _AFK and "Voce esta AFK (Anti-Kick Ativo)" or "Voce esta Online", "SYS", os.time()) Ib:ReleaseFocus() return end
+        if msg=="/afk" then _AFK=not _AFK _Add("SYS", _AFK and "Voce esta AFK" or "Voce esta Online", "SYS", os.time()) Ib:ReleaseFocus() return end
         if msg=="/globalclear" and P.Name==_M then 
             task.spawn(function() _Req({Url=_DB..".json",Method="POST",Headers={["Content-Type"]="application/json"},Body=H:JSONEncode({u="SYS",rn="SYS",m="!!CMD:CLEAR!!",t=os.time()+9999})}) task.wait(0.5) _Req({Url=_DB..".json",Method="DELETE"}) end)
             for _,c in pairs(Sf:GetChildren()) do if c:IsA("Frame") then c:Destroy() end end Ib:ReleaseFocus() return 
