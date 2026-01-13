@@ -1,0 +1,178 @@
+task.spawn(function()
+    local L,U,H,C,S,T=game:GetService("Players"),game:GetService("UserInputService"),game:GetService("HttpService"),game:GetService("CoreGui"),game:GetService("StarterGui"),game:GetService("TextChatService")
+    local P=L.LocalPlayer
+    local _DB="https://rdb001-d0bda-default-rtdb.firebaseio.com/chat"
+    local _M="leolindoxx25"
+    local _LT=0
+    local _LM=""
+
+    for _,x in pairs(C:GetChildren()) do if x.Name:find("ChatV25") then x:Destroy() end end
+
+    local function _Req(a)
+        local r=request or http_request or (syn and syn.request) or (fluxus and fluxus.request) or (krnl and krnl.request) or (http and http.request)
+        if not r then return nil end
+        local s,v=pcall(r,a)
+        if s then return v end
+        return nil
+    end
+
+    local _A,_W,_RD=getcustomasset or getsynasset,writefile,readfile
+    
+    pcall(function() S:SetCoreGuiEnabled(Enum.CoreGuiType.Chat,false) end)
+    pcall(function() local x=game:GetService("TextChatService") if x:FindFirstChild("ChatWindowConfiguration") then x.ChatWindowConfiguration.Enabled=false x.ChatInputBarConfiguration.Enabled=false end end)
+
+    local _Th={B=Color3.fromRGB(15,15,15),I=Color3.fromRGB(25,25,25),T=Color3.fromRGB(230,230,230)}
+
+    local function _GetGrad(n)
+        if n==_M then
+            return ColorSequence.new{ColorSequenceKeypoint.new(0,Color3.fromRGB(220,20,60)), ColorSequenceKeypoint.new(1,Color3.new(0,0,0))}
+        end
+        local s=0 for i=1,#n do s=s+string.byte(n,i) end math.randomseed(s)
+        return ColorSequence.new{ColorSequenceKeypoint.new(0,Color3.fromHSV(math.random(),0.8,1)), ColorSequenceKeypoint.new(1,Color3.fromHSV(math.random(),0.8,0.6))}
+    end
+
+    local function _New(c,p)
+        local i=Instance.new(c)
+        local cr,gr=p.Cr,p.Gd
+        p.Cr,p.Gd=nil,nil
+        for k,v in pairs(p) do i[k]=v end
+        if cr then local u=Instance.new("UICorner") u.CornerRadius=UDim.new(0,cr) u.Parent=i end
+        if gr then local g=Instance.new("UIGradient") g.Rotation=gr.R or 90 g.Color=gr.C g.Parent=i end
+        return i
+    end
+
+    local Sc=_New("ScreenGui",{Name="ChatV25_"..math.random(1e4),Parent=C,ResetOnSpawn=false})
+    local M=_New("Frame",{Parent=Sc,Size=UDim2.new(0,480,0,240),Position=UDim2.new(0,10,0,10),BackgroundColor3=_Th.B,BackgroundTransparency=0.1,Active=true,Cr=8})
+    local Sf=_New("ScrollingFrame",{Parent=M,Size=UDim2.new(1,-10,1,-45),Position=UDim2.new(0,5,0,5),BackgroundTransparency=1,ScrollBarThickness=2,VerticalScrollBarInset=Enum.ScrollBarInset.None,AutomaticCanvasSize=Enum.AutomaticSize.Y,CanvasSize=UDim2.new(0,0,0,0)})
+    _New("UIListLayout",{Parent=Sf,Padding=UDim.new(0,0),SortOrder=Enum.SortOrder.LayoutOrder})
+
+    local If=_New("Frame",{Parent=M,Size=UDim2.new(1,-10,0,30),Position=UDim2.new(0,5,1,-35),BackgroundColor3=_Th.I,Cr=6})
+    local Ib=_New("TextBox",{Parent=If,Size=UDim2.new(1,-35,1,0),Position=UDim2.new(0,5,0,0),BackgroundTransparency=1,Text="",PlaceholderText="Clique aqui ou aperte a tecla '/'",TextColor3=_Th.T,Font=Enum.Font.Gotham,TextSize=13,TextXAlignment=Enum.TextXAlignment.Left,ClearTextOnFocus=false})
+    local Sb=_New("TextButton",{Parent=If,Size=UDim2.new(0,30,1,0),Position=UDim2.new(1,-30,0,0),BackgroundTransparency=1,Text=">",TextColor3=Color3.new(1,1,1),Font=Enum.Font.GothamBold,TextSize=18})
+    local Tg=_New("TextButton",{Parent=Sc,Size=UDim2.new(0,60,0,30),Position=UDim2.new(1,-70,0,10),BackgroundColor3=_Th.I,Text="Chat",TextColor3=Color3.new(1,1,1),Font=Enum.Font.GothamBold,BackgroundTransparency=0.2,Cr=6})
+
+    local function _Med(u,e,lbl,c)
+        task.spawn(function()
+            if not _A or not _W then 
+                if lbl then lbl.Text="[Sem Suporte]" lbl.Visible=true end
+                return 
+            end
+            local n="tmp_"..math.random(1e6)..e
+            local r=_Req({Url=u,Method="GET"})
+            if r and r.Success then 
+                _W(n,r.Body) 
+                c(n)
+                if lbl then lbl.Visible=false end
+            else
+                if lbl then lbl.Text="[Erro Imagem]" lbl.Visible=true end
+            end
+        end)
+    end
+
+    local function _ShowUpdate()
+        local Loader=Instance.new("ScreenGui") Loader.Name="UpdateScreen" Loader.IgnoreGuiInset=true Loader.Parent=C
+        local BG=Instance.new("Frame") BG.Parent=Loader BG.Size=UDim2.new(1,0,1,0) BG.BackgroundColor3=Color3.new(0,0,0) BG.BorderSizePixel=0 BG.ZIndex=9999
+        local Txt=Instance.new("TextLabel") Txt.Parent=BG Txt.Size=UDim2.new(1,0,1,0) Txt.BackgroundTransparency=1 Txt.Text="Atualizando....\n(Por Favor Aguarde)" Txt.TextColor3=Color3.new(1,1,1) Txt.TextSize=24 Txt.Font=Enum.Font.GothamBold Txt.ZIndex=10000
+        task.wait(2)
+        for _,c in pairs(Sf:GetChildren()) do if c:IsA("Frame") then c:Destroy() end end
+        Loader:Destroy()
+    end
+
+    local function _Add(u,m,rn,t)
+        rn=rn or u
+        if m=="!!CMD:CLEAR!!" then for _,c in pairs(Sf:GetChildren()) do if c:IsA("Frame") then c:Destroy() end end return end
+        if m=="!!CMD:UPDATE!!" then _ShowUpdate() return end
+
+        local isPlayer = false
+        local target = ""
+        for _, p in pairs(L:GetPlayers()) do
+            if m:lower():find("@"..p.Name:lower()) or m:lower():find("@"..p.DisplayName:lower()) then
+                isPlayer = true
+                target = p.Name
+            end
+        end
+
+        if rn ~= P.Name then 
+            if m:find("@everyone") then
+                pcall(function() S:SetCore("SendNotification",{Title="Alert",Text="Everyone call from "..u,Duration=5}) end)
+            elseif isPlayer and (target == P.Name) then
+                pcall(function() S:SetCore("SendNotification",{Title="Alert",Text="@"..u.." marked you!",Duration=5}) end)
+            end
+        end
+
+        local fmtM = m:gsub("(@[%w_]+)", function(s)
+            local valid = false
+            if s == "@everyone" then return '<font color="rgb(255,220,0)"><b>@everyone</b></font>' end
+            for _, p in pairs(L:GetPlayers()) do
+                if s:lower() == "@"..p.Name:lower() or s:lower() == "@"..p.DisplayName:lower() then valid = true break end
+            end
+            return valid and '<font color="rgb(88,101,242)"><b>'..s..'</b></font>' or s
+        end)
+
+        local Box=_New("Frame",{Parent=Sf,AutomaticSize=Enum.AutomaticSize.XY,Size=UDim2.new(1,0,0,0),BackgroundTransparency=1})
+        _New("UIListLayout",{Parent=Box,FillDirection=Enum.FillDirection.Horizontal,SortOrder=Enum.SortOrder.LayoutOrder,Padding=UDim.new(0,4)})
+
+        local Name=_New("TextLabel",{Parent=Box,AutomaticSize=Enum.AutomaticSize.XY,BackgroundTransparency=1,Text="["..u.."]:",Font=Enum.Font.GothamBold,TextSize=14,TextColor3=Color3.new(1,1,1)})
+        _New("UIGradient",{Parent=Name,Rotation=90,Color=_GetGrad(rn)})
+
+        local Msg=_New("TextLabel",{Parent=Box,AutomaticSize=Enum.AutomaticSize.XY,BackgroundTransparency=1,Text=fmtM,RichText=true,Font=Enum.Font.Gotham,TextSize=14,TextColor3=Color3.new(1,1,1),TextXAlignment=Enum.TextXAlignment.Left,TextWrapped=true})
+
+        local iI=m:find("http") and (m:find(".png") or m:find(".jpg"))
+        if iI then
+            Msg.Text=""
+            local MediaBox=_New("Frame",{Parent=Box,Size=UDim2.new(0,160,0,120),BackgroundTransparency=1}) 
+            local InfoLbl=_New("TextLabel",{Parent=MediaBox,Size=UDim2.new(1,0,1,0),BackgroundTransparency=1,Text="Carregando...",TextColor3=Color3.fromRGB(150,150,150),TextSize=12,Font=Enum.Font.Gotham})
+            local Im=_New("ImageLabel",{Parent=MediaBox,Size=UDim2.new(1,0,1,0),BackgroundTransparency=1,ScaleType=Enum.ScaleType.Fit,ResampleMode=Enum.ResamplerMode.Default,Image="",Cr=8,ClipsDescendants=true})
+            _Med(m,".png",InfoLbl,function(p) Im.Image=_A(p) end)
+        end
+        Sf.CanvasPosition=Vector2.new(0,9e5)
+    end
+
+    local function _Snd()
+        local msg=Ib.Text
+        if not msg:find("%S") or #msg>300 then return end
+        Ib.Text=""
+        if msg=="/clear" then for _,c in pairs(Sf:GetChildren()) do if c:IsA("Frame") then c:Destroy() end end Ib:ReleaseFocus() return end
+        if msg=="/globalclear" and P.Name==_M then 
+            task.spawn(function()
+                _Req({Url=_DB..".json",Method="POST",Headers={["Content-Type"]="application/json"},Body=H:JSONEncode({u="SYS",rn="SYS",m="!!CMD:CLEAR!!",t=os.time()+9999})})
+                task.wait(0.5) _Req({Url=_DB..".json",Method="DELETE"})
+            end)
+            for _,c in pairs(Sf:GetChildren()) do if c:IsA("Frame") then c:Destroy() end end
+            Ib:ReleaseFocus() return 
+        end
+        _Add(P.DisplayName,msg,P.Name,os.time())
+        _LT=os.time()
+        _LM=msg
+        task.spawn(function() _Req({Url=_DB..".json",Method="POST",Headers={["Content-Type"]="application/json"},Body=H:JSONEncode({["u"]=P.DisplayName,["rn"]=P.Name,["m"]=msg,["t"]=os.time()})}) end)
+        Ib:ReleaseFocus()
+    end
+
+    Sb.MouseButton1Click:Connect(_Snd)
+    Ib.FocusLost:Connect(function(e) if e then _Snd() end end)
+    Tg.MouseButton1Click:Connect(function() M.Visible=not M.Visible end)
+    U.InputBegan:Connect(function(k,p) if not p and k.KeyCode==Enum.KeyCode.Slash then task.wait() Ib:CaptureFocus() Ib.Text="" end end)
+
+    local L_Last=0
+    task.spawn(function()
+        while task.wait(1.5) do
+            local r=_Req({Url=_DB..".json",Method="GET"})
+            if r and r.Body and r.Body~="null" then 
+                local s,d=pcall(function() return H:JSONDecode(r.Body) end)
+                if s and d then
+                    local t={}
+                    for id,v in pairs(d) do if type(v)=="table" and v.t then v.id=id v.t=tonumber(v.t) or 0 table.insert(t,v) end end
+                    table.sort(t,function(a,b) return a.t<b.t end)
+                    if #t>15 then task.spawn(function() for i=1,(#t-15) do _Req({Url=_DB.."/"..t[i].id..".json",Method="DELETE"}) end end) end
+                    for _,v in ipairs(t) do 
+                        if v.t>L_Last then 
+                            local isEcho = (v.rn==P.Name and v.m==_LM and math.abs(v.t-_LT)<5)
+                            if not isEcho then _Add(v.u,v.m,v.rn,v.t) end
+                            L_Last=v.t 
+                        end 
+                    end 
+                end 
+            end 
+        end 
+    end)
+end)()
