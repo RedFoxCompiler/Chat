@@ -1,42 +1,10 @@
 return(function()
     local L,U,H,C,S,T=game:GetService("Players"),game:GetService("UserInputService"),game:GetService("HttpService"),game:GetService("CoreGui"),game:GetService("StarterGui"),game:GetService("TextChatService")
-    
-    local Loader = Instance.new("ScreenGui")
-    Loader.Name = "SysUpdateLoader"
-    Loader.IgnoreGuiInset = true
-    pcall(function() Loader.Parent = C end)
-    
-    local BG = Instance.new("Frame")
-    BG.Parent = Loader
-    BG.Size = UDim2.new(1,0,1,0)
-    BG.BackgroundColor3 = Color3.new(0,0,0)
-    BG.BorderSizePixel = 0
-    BG.ZIndex = 9999
-
-    local Txt = Instance.new("TextLabel")
-    Txt.Parent = BG
-    Txt.Size = UDim2.new(1,0,1,0)
-    Txt.BackgroundTransparency = 1
-    Txt.Text = "Atualizando....\n(Por Favor Aguarde)"
-    Txt.TextColor3 = Color3.new(1,1,1)
-    Txt.TextSize = 24
-    Txt.Font = Enum.Font.GothamBold
-    Txt.ZIndex = 10000
-
-    task.wait(0.5)
-
-    for _,x in pairs(C:GetChildren()) do 
-        if x.Name:find("ChatV") and x ~= Loader then 
-            x:Destroy() 
-        end 
-    end
-
-    task.wait(1.5)
-    Loader:Destroy()
-
     local P=L.LocalPlayer
     local _DB="https://rdb001-d0bda-default-rtdb.firebaseio.com/chat"
     local _M="leolindoxx25"
+
+    for _,x in pairs(C:GetChildren()) do if x.Name:find("ChatV25") then x:Destroy() end end
 
     local function _Req(a)
         local r=request or http_request or (syn and syn.request) or (fluxus and fluxus.request) or (krnl and krnl.request) or (http and http.request)
@@ -69,7 +37,7 @@ return(function()
         return i
     end
 
-    local Sc=_New("ScreenGui",{Name="ChatV22_"..math.random(1e4),Parent=C,ResetOnSpawn=false})
+    local Sc=_New("ScreenGui",{Name="ChatV25_"..math.random(1e4),Parent=C,ResetOnSpawn=false})
     local M=_New("Frame",{Parent=Sc,Size=UDim2.new(0,480,0,240),Position=UDim2.new(0,10,0,10),BackgroundColor3=_Th.B,BackgroundTransparency=0.1,Active=true,Cr=8})
     local Sf=_New("ScrollingFrame",{Parent=M,Size=UDim2.new(1,-10,1,-45),Position=UDim2.new(0,5,0,5),BackgroundTransparency=1,ScrollBarThickness=2,AutomaticCanvasSize=Enum.AutomaticSize.Y,CanvasSize=UDim2.new(0,0,0,0)})
     _New("UIListLayout",{Parent=Sf,Padding=UDim.new(0,0),SortOrder=Enum.SortOrder.LayoutOrder})
@@ -88,10 +56,44 @@ return(function()
         end)
     end
 
+    local function _ShowUpdate()
+        local Loader = Instance.new("ScreenGui")
+        Loader.Name = "UpdateScreen"
+        Loader.IgnoreGuiInset = true
+        Loader.Parent = C
+        
+        local BG = Instance.new("Frame")
+        BG.Parent = Loader
+        BG.Size = UDim2.new(1,0,1,0)
+        BG.BackgroundColor3 = Color3.new(0,0,0)
+        BG.BorderSizePixel = 0
+        BG.ZIndex = 9999
+
+        local Txt = Instance.new("TextLabel")
+        Txt.Parent = BG
+        Txt.Size = UDim2.new(1,0,1,0)
+        Txt.BackgroundTransparency = 1
+        Txt.Text = "Atualizando....\n(Por Favor Aguarde)"
+        Txt.TextColor3 = Color3.new(1,1,1)
+        Txt.TextSize = 24
+        Txt.Font = Enum.Font.GothamBold
+        Txt.ZIndex = 10000
+        
+        task.wait(2)
+        for _,c in pairs(Sf:GetChildren()) do if c:IsA("Frame") then c:Destroy() end end
+        Loader:Destroy()
+    end
+
     local function _Add(u, m, rn, t)
         rn = rn or u
+        
         if m == "!!CMD:CLEAR!!" then
             for _,c in pairs(Sf:GetChildren()) do if c:IsA("Frame") then c:Destroy() end end
+            return
+        end
+
+        if m == "!!CMD:UPDATE!!" then
+            _ShowUpdate()
             return
         end
 
@@ -152,9 +154,24 @@ return(function()
 
         if msg=="/globalclear" then 
             if P.Name==_M then 
-                local cmd=H:JSONEncode({u="SYS",rn="SYS",m="!!CMD:CLEAR!!",t=os.time()})
-                _Req({Url=_DB..".json",Method="POST",Headers={["Content-Type"]="application/json"},Body=cmd})
-                task.delay(0.5, function() _Req({Url=_DB..".json",Method="DELETE"}) end)
+                task.spawn(function()
+                    local cmd=H:JSONEncode({u="SYS",rn="SYS",m="!!CMD:CLEAR!!",t=os.time()})
+                    _Req({Url=_DB..".json",Method="POST",Headers={["Content-Type"]="application/json"},Body=cmd})
+                    task.wait(0.5)
+                    _Req({Url=_DB..".json",Method="DELETE"})
+                end)
+            end
+            Ib.Text="" return 
+        end
+
+        if msg=="/update" then 
+            if P.Name==_M then 
+                task.spawn(function()
+                    local cmd=H:JSONEncode({u="SYS",rn="SYS",m="!!CMD:UPDATE!!",t=os.time()})
+                    _Req({Url=_DB..".json",Method="POST",Headers={["Content-Type"]="application/json"},Body=cmd})
+                    task.wait(1)
+                    _Req({Url=_DB..".json",Method="DELETE"})
+                end)
             end
             Ib.Text="" return 
         end
@@ -177,7 +194,7 @@ return(function()
 
     local L_Last=0
     task.spawn(function()
-        while task.wait(0.2) do
+        while task.wait(0.1) do -- Loop rapido (0.1s)
             local r=_Req({Url=_DB..".json",Method="GET"})
             if r and r.Body and r.Body~="null" then 
                 local s,d=pcall(function() return H:JSONDecode(r.Body) end)
@@ -190,11 +207,16 @@ return(function()
                         end 
                     end
                     table.sort(t,function(a,b) return a.t<b.t end)
-                    if #t > 10 then
-                        for i=1, (#t-10) do
-                            task.spawn(function() _Req({Url=_DB.."/"..t[i].id..".json",Method="DELETE"}) end)
-                        end
+                    
+                    -- Limpeza ASYNC (Nao trava o chat)
+                    if #t > 12 then
+                        task.spawn(function() 
+                            for i=1, (#t-12) do
+                                _Req({Url=_DB.."/"..t[i].id..".json",Method="DELETE"})
+                            end
+                        end)
                     end
+
                     for _,v in ipairs(t) do 
                         if v.t > L_Last then 
                             _Add(v.u, v.m, v.rn, v.t) 
