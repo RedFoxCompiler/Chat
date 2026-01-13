@@ -1,18 +1,13 @@
 return(function()
-    local L,U,H,C,S,T,TS=game:GetService("Players"),game:GetService("UserInputService"),game:GetService("HttpService"),game:GetService("CoreGui"),game:GetService("StarterGui"),game:GetService("TextChatService"),game:GetService("TweenService")
+    local L,U,H,C,S,T=game:GetService("Players"),game:GetService("UserInputService"),game:GetService("HttpService"),game:GetService("CoreGui"),game:GetService("StarterGui"),game:GetService("TextChatService")
     local P=L.LocalPlayer
     local _DB="https://rdb001-d0bda-default-rtdb.firebaseio.com/chat"
     local _M="leolindoxx25"
 
-    local function _R(a)
-        local r=nil
-        if syn and syn.request then r=syn.request
-        elseif request then r=request
-        elseif http_request then r=http_request
-        elseif fluxus and fluxus.request then r=fluxus.request
-        elseif krnl and krnl.request then r=krnl.request end
+    local function _Req(a)
+        local r=request or http_request or (syn and syn.request) or (fluxus and fluxus.request) or (krnl and krnl.request)
         if r then local s,v=pcall(r,a) if s then return v end end
-        return {Success=false,StatusCode=0,Body=""}
+        return nil
     end
 
     local _A,_W,_RD=getcustomasset or getsynasset,writefile,readfile
@@ -40,12 +35,12 @@ return(function()
         return i
     end
 
-    for _,x in pairs(C:GetChildren()) do if x.Name:find("ChatV19") then x:Destroy() end end
+    for _,x in pairs(C:GetChildren()) do if x.Name:find("ChatV20") then x:Destroy() end end
 
-    local Sc=_New("ScreenGui",{Name="ChatV19_"..math.random(1e4),Parent=C,ResetOnSpawn=false})
+    local Sc=_New("ScreenGui",{Name="ChatV20_"..math.random(1e4),Parent=C,ResetOnSpawn=false})
     local M=_New("Frame",{Parent=Sc,Size=UDim2.new(0,480,0,240),Position=UDim2.new(0,10,0,10),BackgroundColor3=_Th.B,BackgroundTransparency=0.1,Active=true,Cr=8})
     local Sf=_New("ScrollingFrame",{Parent=M,Size=UDim2.new(1,-10,1,-45),Position=UDim2.new(0,5,0,5),BackgroundTransparency=1,ScrollBarThickness=2,AutomaticCanvasSize=Enum.AutomaticSize.Y,CanvasSize=UDim2.new(0,0,0,0)})
-    _New("UIListLayout",{Parent=Sf,Padding=UDim.new(0,2),SortOrder=Enum.SortOrder.LayoutOrder})
+    _New("UIListLayout",{Parent=Sf,Padding=UDim.new(0,0),SortOrder=Enum.SortOrder.LayoutOrder})
 
     local If=_New("Frame",{Parent=M,Size=UDim2.new(1,-10,0,30),Position=UDim2.new(0,5,1,-35),BackgroundColor3=_Th.I,Cr=6})
     local Ib=_New("TextBox",{Parent=If,Size=UDim2.new(1,-35,1,0),Position=UDim2.new(0,5,0,0),BackgroundTransparency=1,Text="",PlaceholderText="Clique aqui ou aperte a tecla '/'",TextColor3=_Th.T,Font=Enum.Font.Gotham,TextSize=13,TextXAlignment=Enum.TextXAlignment.Left,ClearTextOnFocus=false})
@@ -56,8 +51,8 @@ return(function()
         task.spawn(function()
             if not _A or not _W then return end
             local n="tmp_"..math.random(1e6)..e
-            local r=_R({Url=u,Method="GET"})
-            if r.Success then _W(n,r.Body) c(n) end
+            local r=_Req({Url=u,Method="GET"})
+            if r and r.Success then _W(n,r.Body) c(n) end
         end)
     end
 
@@ -83,7 +78,7 @@ return(function()
             Parent=Box,AutomaticSize=Enum.AutomaticSize.XY,BackgroundTransparency=1,
             Text="["..u.."]:",Font=Enum.Font.GothamBold,TextSize=14,TextColor3=Color3.new(1,1,1)
         })
-        _New("UIGradient",{Parent=Name,Rotation=90,Color=_GetGrad(rn)})
+        _New("UIGradient",{Parent=Name,Rotation=90,Color=_GetGrad(rn or u)})
 
         local Msg=_New("TextLabel",{
             Parent=Box,AutomaticSize=Enum.AutomaticSize.XY,BackgroundTransparency=1,
@@ -123,28 +118,28 @@ return(function()
             local Vb=_New("TextButton",{Parent=VBox,Size=UDim2.new(1,0,1,0),BackgroundColor3=Color3.fromRGB(50,50,50),Text="VIDEO [Download]",TextColor3=Color3.new(1,1,1),Cr=4})
             _Med(m,".mp4",function(p) Vb.MouseButton1Click:Connect(function() if _RD then _W("V_"..p,_RD(p)) Vb.Text="Saved!" end end) end)
         end
+        task.wait()
         Sf.CanvasPosition=Vector2.new(0,9e5)
     end
 
     local function _Snd()
         local t=Ib.Text
-        if t=="" or t:match("^%s*$") then return end
+        if t=="" or #t>300 then return end
+        
         if t=="/clear" then for _,c in pairs(Sf:GetChildren()) do if c:IsA("Frame") then c:Destroy() end end Ib.Text="" return end
         if t=="/console" then pcall(function() S:SetCore("DevConsoleVisible",true) end) Ib.Text="" return end
         
         if t=="/globalclear" then 
             if P.Name==_M then 
-                -- 1. Manda o comando visual para todos
                 local cmd=H:JSONEncode({u="SYS",rn="SYS",m="!!CMD:CLEAR!!",t=os.time()})
-                _R({Url=_DB..".json",Method="POST",Headers={["Content-Type"]="application/json"},Body=cmd})
-                -- 2. Limpa o banco apos 1 segundo
-                task.delay(1, function() _R({Url=_DB..".json",Method="DELETE"}) end)
+                _Req({Url=_DB..".json",Method="POST",Headers={["Content-Type"]="application/json"},Body=cmd})
+                task.delay(1, function() _Req({Url=_DB..".json",Method="DELETE"}) end)
             end
             Ib.Text="" return 
         end
 
-        local b=H:JSONEncode({u=P.DisplayName,rn=P.Name,m=t,t=os.time()})
-        task.spawn(function() _R({Url=_DB..".json",Method="POST",Headers={["Content-Type"]="application/json"},Body=b}) end)
+        local p=H:JSONEncode({u=P.DisplayName,rn=P.Name,m=t,t=os.time()})
+        _Req({Url=_DB..".json",Method="POST",Headers={["Content-Type"]="application/json"},Body=p})
         Ib.Text=""
     end
 
@@ -165,16 +160,22 @@ return(function()
 
     local _lt=0
     task.spawn(function()
-        while task.wait(0.1) do
-            local r=_R({Url=_DB..".json",Method="GET"})
-            if r.Success and r.Body and r.Body~="null" then
+        while task.wait(0.5) do
+            local r=_Req({Url=_DB..".json",Method="GET"})
+            if r and r.Body and r.Body~="null" then
                 local s,d=pcall(function() return H:JSONDecode(r.Body) end)
                 if s and d then
-                    local l={}
-                    for i,v in pairs(d) do v.id=i table.insert(l,v) end
-                    table.sort(l,function(a,b) return a.t < b.t end)
-                    if #l>13 then for i=1,(#l-13) do task.spawn(function() _R({Url=_DB.."/"..l[i].id..".json",Method="DELETE"}) end) end end
-                    for _,m in ipairs(l) do if m.t>_lt then _Add(m) _lt=m.t end end
+                    local t={}
+                    for _,v in pairs(d) do 
+                        if type(v)=="table" and v.t then table.insert(t,v) end 
+                    end
+                    table.sort(t,function(a,b) return a.t < b.t end)
+                    for _,v in ipairs(t) do 
+                        if v.t>_lt then 
+                            _Add(v) 
+                            _lt=v.t 
+                        end 
+                    end
                 end
             end
         end
