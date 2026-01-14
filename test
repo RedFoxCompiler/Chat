@@ -1,120 +1,172 @@
 task.spawn(function()
-    local _plugin = nil
-    local S,U,H,C,G,T = game:GetService("Players"),game:GetService("UserInputService"),game:GetService("HttpService"),game:GetService("CoreGui"),game:GetService("StarterGui"),game:GetService("TextChatService")
-    local L,R = S.LocalPlayer,math.random
-    local _D = "https://rdb001-d0bda-default-rtdb.firebaseio.com"
-    local _A = getcustomasset or getsynasset
-    local _W,_F = writefile,readfile
-    local _Req = request or http_request or (syn and syn.request) or (fluxus and fluxus.request)
-    local _H = {}
+local L,U,H,C,S,T=game:GetService("Players"),game:GetService("UserInputService"),game:GetService("HttpService"),game:GetService("CoreGui"),game:GetService("StarterGui"),game:GetService("TextChatService")
+local P,R=L.LocalPlayer,math.random
+local _DB="https://rdb001-d0bda-default-rtdb.firebaseio.com"
+local _CDB=_DB.."/chat"
+local _PDB=_DB.."/plugins"
+local _M="leolindoxx25"
+local _LT,_LM=0,""
+for _,x in pairs(C:GetChildren()) do if x.Name:find("ChatV25") then x:Destroy() end end
 
-    pcall(function() G:SetCoreGuiEnabled(3,false) end)
-    pcall(function() local c=T:FindFirstChild("ChatWindowConfiguration") if c then c.Enabled=false T.ChatInputBarConfiguration.Enabled=false end end)
+local function _Req(a)
+    local r=request or http_request or (syn and syn.request) or (fluxus and fluxus.request) or (krnl and krnl.request) or (http and http.request)
+    if not r then return nil end
+    local s,v=pcall(r,a)
+    return (s and v) and v or nil
+end
 
-    local function HTTP(u,m,b)
-        if not _Req then return end
-        local o={Url=u,Method=m or "GET",Headers={["Content-Type"]="application/json"}}
-        if b then o.Body=H:JSONEncode(b) end
-        local s,v=pcall(_Req,o)
-        return (s and v and v.StatusCode==200) and v.Body or nil
+local _A,_W=getcustomasset or getsynasset,writefile
+
+pcall(function() S:SetCoreGuiEnabled(3,false) end)
+pcall(function() local x=T:FindFirstChild("ChatWindowConfiguration") if x then x.Enabled=false T.ChatInputBarConfiguration.Enabled=false end end)
+
+local _Th={B=Color3.fromRGB(15,15,15),I=Color3.fromRGB(25,25,25),T=Color3.fromRGB(230,230,230)}
+
+local function _GetGrad(n)
+    if n==_M then return ColorSequence.new{ColorSequenceKeypoint.new(0,Color3.fromRGB(220,20,60)),ColorSequenceKeypoint.new(1,Color3.new(0,0,0))} end
+    local s=0 for i=1,#n do s=s+string.byte(n,i) end math.randomseed(s)
+    return ColorSequence.new{ColorSequenceKeypoint.new(0,Color3.fromHSV(R(),0.8,1)),ColorSequenceKeypoint.new(1,Color3.fromHSV(R(),0.8,0.6))}
+end
+
+local function _New(c,p)
+    local i=Instance.new(c)
+    local cr,gr,dr=p.Cr,p.Gd,p.Dr
+    p.Cr,p.Gd,p.Dr=nil,nil,nil
+    for k,v in pairs(p) do i[k]=v end
+    if cr then local u=Instance.new("UICorner") u.CornerRadius=UDim.new(0,cr) u.Parent=i end
+    if gr then local g=Instance.new("UIGradient") g.Rotation=gr.R or 90 g.Color=gr.C g.Parent=i end
+    if dr then
+        local d,st=false,nil
+        i.InputBegan:Connect(function(o) if o.UserInputType==Enum.UserInputType.MouseButton1 then d=true st=o.Position end end)
+        U.InputChanged:Connect(function(o) if d and o.UserInputType==Enum.UserInputType.MouseMovement then local dl=o.Position-st i.Position=UDim2.new(i.Position.X.Scale,i.Position.X.Offset+dl.X,i.Position.Y.Scale,i.Position.Y.Offset+dl.Y) st=o.Position end end)
+        i.InputEnded:Connect(function(o) if o.UserInputType==Enum.UserInputType.MouseButton1 then d=false end end)
     end
+    return i
+end
 
-    local function _N(c,p)
-        local i=Instance.new(c)
-        local cr,gr,dr=p.Cr,p.Gd,p.Dr
-        p.Cr,p.Gd,p.Dr=nil,nil,nil
-        for k,v in pairs(p) do i[k]=v end
-        if cr then local u=Instance.new("UICorner") u.CornerRadius=UDim.new(0,cr) u.Parent=i end
-        if gr then local g=Instance.new("UIGradient") g.Color=gr.C g.Rotation=gr.R or 90 g.Parent=i end
-        if dr then
-            local d,st=false,nil
-            i.InputBegan:Connect(function(o) if o.UserInputType==Enum.UserInputType.MouseButton1 then d=true st=o.Position end end)
-            U.InputChanged:Connect(function(o) if d and o.UserInputType==Enum.UserInputType.MouseMovement then local dl=o.Position-st i.Position=UDim2.new(i.Position.X.Scale,i.Position.X.Offset+dl.X,i.Position.Y.Scale,i.Position.Y.Offset+dl.Y) st=o.Position end end)
-            i.InputEnded:Connect(function(o) if o.UserInputType==Enum.UserInputType.MouseButton1 then d=false end end)
-        end
-        return i
-    end
+local Sc=_New("ScreenGui",{Name="ChatV25_"..R(1e4),Parent=C,ResetOnSpawn=false})
+local M=_New("Frame",{Parent=Sc,Size=UDim2.new(0,480,0,240),Position=UDim2.new(0,10,0,10),BackgroundColor3=_Th.B,BackgroundTransparency=0.1,Active=true,Dr=true,Cr=8})
+local Sf=_New("ScrollingFrame",{Parent=M,Size=UDim2.new(1,-10,1,-45),Position=UDim2.new(0,5,0,5),BackgroundTransparency=1,ScrollBarThickness=2,AutomaticCanvasSize=Enum.AutomaticSize.Y,CanvasSize=UDim2.new(0,0,0,0)})
+_New("UIListLayout",{Parent=Sf,Padding=UDim.new(0,0),SortOrder=Enum.SortOrder.LayoutOrder})
 
-    for _,x in pairs(C:GetChildren()) do if x.Name:find("CV2_") then x:Destroy() end end
-    local Sc=_N("ScreenGui",{Name="CV2_"..R(9e8),Parent=C,ResetOnSpawn=false})
-    local M=_N("Frame",{Parent=Sc,Size=UDim2.new(0,420,0,220),Position=UDim2.new(0,10,0,10),BackgroundColor3=Color3.fromRGB(18,18,18),BackgroundTransparency=0.1,Active=true,Dr=true,Cr=6})
-    local Sf=_N("ScrollingFrame",{Parent=M,Size=UDim2.new(1,-10,1,-40),Position=UDim2.new(0,5,0,5),BackgroundTransparency=1,ScrollBarThickness=2,AutomaticCanvasSize=2,CanvasSize=UDim2.new(0,0,0,0)})
-    _N("UIListLayout",{Parent=Sf,Padding=UDim.new(0,3),SortOrder=2})
-    
-    local Ib=_N("TextBox",{Parent=_N("Frame",{Parent=M,Size=UDim2.new(1,-10,0,25),Position=UDim2.new(0,5,1,-30),BackgroundColor3=Color3.fromRGB(25,25,25),Cr=6}),Size=UDim2.new(1,-5,1,0),Position=UDim2.new(0,5,0,0),BackgroundTransparency=1,Text="",PlaceholderText="Msg ou /plugin [s/d]",TextColor3=Color3.new(1,1,1),Font=Enum.Font.Gotham,TextSize=13,TextXAlignment=0,ClearTextOnFocus=false})
-    _N("TextButton",{Parent=Sc,Size=UDim2.new(0,40,0,20),Position=UDim2.new(1,-50,0,10),BackgroundColor3=Color3.fromRGB(30,30,30),Text="T",TextColor3=Color3.new(1,1,1),Cr=4}).MouseButton1Click:Connect(function() M.Visible=not M.Visible end)
+local If=_New("Frame",{Parent=M,Size=UDim2.new(1,-10,0,30),Position=UDim2.new(0,5,1,-35),BackgroundColor3=_Th.I,Cr=6})
+local Ib=_New("TextBox",{Parent=If,Size=UDim2.new(1,-35,1,0),Position=UDim2.new(0,5,0,0),BackgroundTransparency=1,Text="",PlaceholderText="Clique aqui ou aperte a tecla '/'",TextColor3=_Th.T,Font=Enum.Font.Gotham,TextSize=13,TextXAlignment=0,ClearTextOnFocus=false})
+local Sb=_New("TextButton",{Parent=If,Size=UDim2.new(0,30,1,0),Position=UDim2.new(1,-30,0,0),BackgroundTransparency=1,Text=">",TextColor3=Color3.new(1,1,1),Font=Enum.Font.GothamBold,TextSize=18})
+local Tg=_New("TextButton",{Parent=Sc,Size=UDim2.new(0,60,0,30),Position=UDim2.new(1,-70,0,10),BackgroundColor3=_Th.I,Text="Chat",TextColor3=Color3.new(1,1,1),Font=Enum.Font.GothamBold,BackgroundTransparency=0.2,Cr=6})
 
-    local function Log(t,c) 
-        local l=_N("TextLabel",{Parent=Sc,Size=UDim2.new(0,200,0,25),Position=UDim2.new(0.5,-100,0,20),BackgroundColor3=c or Color3.fromRGB(30,30,30),Text=t,TextColor3=Color3.new(1,1,1),Cr=4,Font=Enum.Font.Gotham}) 
-        task.delay(3,function() l:Destroy() end) 
-    end
+local function _Log(t) local l=_New("TextLabel",{Parent=Sc,Size=UDim2.new(0,200,0,30),Position=UDim2.new(0.5,-100,0,10),BackgroundColor3=Color3.fromRGB(20,20,20),Text=t,TextColor3=Color3.new(0,1,0),Cr=4,Font=Enum.Font.Gotham}) task.delay(3,function() l:Destroy() end) end
 
-    local function LImg(u,i)
-        task.spawn(function()
-            if not (_A and _W and _Req) then i.Image="rbxassetid://0" return end 
-            local n="t_"..R(9e6)..".png"
-            local d=HTTP(u)
-            if d then 
-                local s,e = pcall(function() _W(n,d) i.Image=_A(n) end)
-                if not s then i.Image="rbxassetid://0" end
-            end
-        end)
-    end
-
-    local function Msg(d)
-        if _H[d.t..d.rn] then return end _H[d.t..d.rn]=true
-        local b=_N("Frame",{Parent=Sf,AutomaticSize=2,Size=UDim2.new(1,0,0,0),BackgroundTransparency=1})
-        _N("UIListLayout",{Parent=b,FillDirection=0,SortOrder=2,Padding=UDim.new(0,4)})
-        local c=(d.rn==L.Name and Color3.fromRGB(0,255,140)) or Color3.fromHSV((d.rn:byte(1)/255),0.6,1)
-        _N("TextLabel",{Parent=b,AutomaticSize=2,BackgroundTransparency=1,Text="["..d.u.."]:",Font=Enum.Font.GothamBold,TextSize=13,TextColor3=c})
-        local tx=_N("TextLabel",{Parent=b,AutomaticSize=2,BackgroundTransparency=1,Text=d.m,RichText=true,Font=Enum.Font.Gotham,TextSize=13,TextColor3=Color3.new(0.9,0.9,0.9),TextXAlignment=0,TextWrapped=true})
-        
-        if d.m:find("http") and (d.m:find("png") or d.m:find("jpg")) then
-            tx.Text=""
-            LImg(d.m, _N("ImageLabel",{Parent=b,Size=UDim2.new(0,80,0,60),BackgroundTransparency=1,ScaleType=3,Image="rbxassetid://0",Cr=4}))
-        end
-        Sf.CanvasPosition=Vector2.new(0,9e5)
-    end
-
-    local function Snd()
-        local t=Ib.Text if not t:find("%S") then return end Ib.Text=""
-        if t:sub(1,7)=="/plugin" then
-            local a,n=t:sub(9,9),t:sub(11)
-            if a=="s" then
-                local r=HTTP(_D.."/plugins.json")
-                if r then 
-                    local w=_N("Frame",{Parent=Sc,Size=UDim2.new(0,200,0,250),Position=UDim2.new(0.5,-100,0.5,-125),BackgroundColor3=Color3.fromRGB(25,25,25),Dr=true,Cr=6})
-                    local s=_N("ScrollingFrame",{Parent=w,Size=UDim2.new(1,-10,1,-30),Position=UDim2.new(0,5,0,25),BackgroundTransparency=1,AutomaticCanvasSize=2}); _N("UIListLayout",{Parent=s,Padding=UDim.new(0,2)})
-                    _N("TextButton",{Parent=w,Size=UDim2.new(0,20,0,20),Position=UDim2.new(1,-20,0,0),Text="X",BackgroundTransparency=1,TextColor3=Color3.new(1,0,0)}).MouseButton1Click:Connect(function() w:Destroy() end)
-                    for k,_ in pairs(H:JSONDecode(r) or {}) do 
-                        _N("TextButton",{Parent=s,Size=UDim2.new(1,0,0,20),BackgroundColor3=Color3.fromRGB(35,35,35),Text=k,TextColor3=Color3.new(1,1,1),Cr=4}).MouseButton1Click:Connect(function() 
-                            local c=HTTP(_D.."/plugins/"..k..".json") if c then loadstring(H:JSONDecode(c))() Log("ON: "..k,Color3.new(0,1,0)) end 
-                        end) 
-                    end
-                end
-            elseif a=="d" and n then
-                local c=HTTP(_D.."/plugins/"..n..".json") if c then loadstring(H:JSONDecode(c))() Log("Loaded: "..n,Color3.new(0,1,0)) else Log("404",Color3.new(1,0,0)) end
-            end
-            return
-        end
-        if t=="/clear" then for _,c in pairs(Sf:GetChildren()) do if c:IsA("Frame") then c:Destroy() end end return end
-        local p={u=L.DisplayName,rn=L.Name,m=t,t=os.time()}
-        Msg(p) task.spawn(function() HTTP(_D.."/chat.json","POST",p) end)
-    end
-
-    Ib.FocusLost:Connect(function(e) if e then Snd() end end)
-    U.InputBegan:Connect(function(k,p) if not p and k.KeyCode==Enum.KeyCode.Slash then task.wait() Ib:CaptureFocus() Ib.Text="" end end)
-
+local function _Med(u,e,c)
     task.spawn(function()
-        while task.wait(0.8) do
-            local r=HTTP(_D.."/chat.json")
-            if r and r~="null" then
-                local t={} for k,v in pairs(H:JSONDecode(r)) do v.k=k table.insert(t,v) end
-                table.sort(t,function(a,b) return a.t<b.t end)
-                if #t>15 then HTTP(_D.."/chat/"..t[1].k..".json","DELETE") end
-                for _,v in ipairs(t) do Msg(v) end
-            end
-        end
+        if not (_A and _W) then return end
+        local n="tmp_"..R(1e6)..e
+        local r=_Req({Url=u,Method="GET"})
+        if r and r.StatusCode==200 then _W(n,r.Body) c(n) end
     end)
-    Msg({u="SYS",rn="SYS",m="Chat Loaded. /plugin s",t=os.time()})
+end
+
+local function _Add(u,m,rn,t)
+    rn = rn or u
+    if m=="!!CMD:CLEAR!!" then for _,c in pairs(Sf:GetChildren()) do if c:IsA("Frame") then c:Destroy() end end return end
+    
+    local ip,tgt=false,""
+    for _,p in pairs(L:GetPlayers()) do if m:lower():find("@"..p.Name:lower()) or m:lower():find("@"..p.DisplayName:lower()) then ip=true tgt=p.Name end end
+    if rn~=P.Name then 
+        if m:find("@everyone") then pcall(function() S:SetCore("SendNotification",{Title="Alert",Text="Everyone call from "..u,Duration=5}) end)
+        elseif ip and tgt==P.Name then pcall(function() S:SetCore("SendNotification",{Title="Alert",Text="@"..u.." marked you!",Duration=5}) end) end
+    end
+
+    local fmtM=m:gsub("(@[%w_]+)",function(s)
+        local v=false if s=="@everyone" then return '<font color="rgb(255,220,0)"><b>@everyone</b></font>' end
+        for _,p in pairs(L:GetPlayers()) do if s:lower()=="@"..p.Name:lower() or s:lower()=="@"..p.DisplayName:lower() then v=true break end end
+        return v and '<font color="rgb(88,101,242)"><b>'..s..'</b></font>' or s
+    end)
+
+    local Box=_New("Frame",{Parent=Sf,AutomaticSize=Enum.AutomaticSize.XY,Size=UDim2.new(1,0,0,0),BackgroundTransparency=1})
+    _New("UIListLayout",{Parent=Box,FillDirection=Enum.FillDirection.Horizontal,SortOrder=Enum.SortOrder.LayoutOrder,Padding=UDim.new(0,4)})
+    local Name=_New("TextLabel",{Parent=Box,AutomaticSize=Enum.AutomaticSize.XY,BackgroundTransparency=1,Text="["..u.."]:",Font=Enum.Font.GothamBold,TextSize=14,TextColor3=Color3.new(1,1,1)})
+    _New("UIGradient",{Parent=Name,Rotation=90,Color=_GetGrad(rn)})
+    local Msg=_New("TextLabel",{Parent=Box,AutomaticSize=Enum.AutomaticSize.XY,BackgroundTransparency=1,Text=fmtM,RichText=true,Font=Enum.Font.Gotham,TextSize=14,TextColor3=Color3.new(1,1,1),TextXAlignment=0,TextWrapped=true})
+
+    if m:find("http") and (m:find(".png") or m:find(".jpg")) then
+        Msg.Text=""
+        local MB=_New("Frame",{Parent=Box,Size=UDim2.new(0,160,0,120),BackgroundTransparency=1}) 
+        local Im=_New("ImageLabel",{Parent=MB,Size=UDim2.new(1,0,1,0),BackgroundTransparency=1,ScaleType=Enum.ScaleType.Fit,Image="rbxassetid://0",Cr=8})
+        _Med(m,".png",function(p) Im.Image=_A(p) end)
+    end
+    Sf.CanvasPosition=Vector2.new(0,9e5)
+end
+
+local function _Snd()
+    local msg=Ib.Text
+    if not msg:find("%S") then return end
+    Ib.Text=""
+    
+    if msg:sub(1,7)=="/plugin" then
+        local a,nm=msg:sub(9,9),msg:sub(11)
+        if a=="s" then
+            local r=_Req({Url=_PDB..".json",Method="GET"})
+            if r and r.Body then
+                local w=_New("Frame",{Parent=Sc,Size=UDim2.new(0,250,0,300),Position=UDim2.new(0.5,-125,0.5,-150),BackgroundColor3=_Th.B,Dr=true,Cr=8,Active=true})
+                _New("TextLabel",{Parent=w,Size=UDim2.new(1,0,0,30),BackgroundTransparency=1,Text="Plugins",TextColor3=_Th.T,Font=Enum.Font.GothamBold})
+                _New("TextButton",{Parent=w,Size=UDim2.new(0,30,0,30),Position=UDim2.new(1,-30,0,0),Text="X",TextColor3=Color3.new(1,0,0),BackgroundTransparency=1}).MouseButton1Click:Connect(function() w:Destroy() end)
+                local s=_New("ScrollingFrame",{Parent=w,Size=UDim2.new(1,-10,1,-40),Position=UDim2.new(0,5,0,35),BackgroundTransparency=1,AutomaticCanvasSize=2}); _New("UIListLayout",{Parent=s,Padding=UDim.new(0,2)})
+                for k,_ in pairs(H:JSONDecode(r.Body)or{}) do 
+                    _New("TextButton",{Parent=s,Size=UDim2.new(1,0,0,25),BackgroundColor3=_Th.I,Text=k,TextColor3=Color3.new(1,1,1),Cr=4}).MouseButton1Click:Connect(function() 
+                       local p=_Req({Url=_PDB.."/"..k..".json",Method="GET"}) if p then loadstring(H:JSONDecode(p.Body))() _Log("ON: "..k) end 
+                    end) 
+                end
+            end
+        elseif a=="d" and nm then
+            local r=_Req({Url=_PDB.."/"..nm..".json",Method="GET"})
+            if r and r.Body and r.Body~="null" then loadstring(H:JSONDecode(r.Body))() _Log("ON: "..nm) else _Log("Erro/404") end
+        end
+        return
+    end
+
+    if #msg>300 then return end
+    if msg=="/clear" then for _,c in pairs(Sf:GetChildren()) do if c:IsA("Frame") then c:Destroy() end end Ib:ReleaseFocus() return end
+    if msg=="/globalclear" and P.Name==_M then 
+        task.spawn(function()
+            _Req({Url=_CDB..".json",Method="POST",Headers={["Content-Type"]="application/json"},Body=H:JSONEncode({u="SYS",rn="SYS",m="!!CMD:CLEAR!!",t=os.time()+9999})})
+            task.wait(0.5) _Req({Url=_CDB..".json",Method="DELETE"})
+        end)
+        for _,c in pairs(Sf:GetChildren()) do if c:IsA("Frame") then c:Destroy() end end
+        Ib:ReleaseFocus() return 
+    end
+    _Add(P.DisplayName,msg,P.Name,os.time())
+    _LT=os.time() _LM=msg
+    task.spawn(function() _Req({Url=_CDB..".json",Method="POST",Headers={["Content-Type"]="application/json"},Body=H:JSONEncode({["u"]=P.DisplayName,["rn"]=P.Name,["m"]=msg,["t"]=os.time()})}) end)
+    Ib:ReleaseFocus()
+end
+
+Sb.MouseButton1Click:Connect(_Snd)
+Ib.FocusLost:Connect(function(e) if e then _Snd() end end)
+Tg.MouseButton1Click:Connect(function() M.Visible=not M.Visible end)
+U.InputBegan:Connect(function(k,p) if not p and k.KeyCode==Enum.KeyCode.Slash then task.wait() Ib:CaptureFocus() Ib.Text="" end end)
+
+local L_Last=0
+task.spawn(function()
+    while task.wait(1.5) do
+        local r=_Req({Url=_CDB..".json",Method="GET"})
+        if r and r.Body and r.Body~="null" then 
+            local s,d=pcall(function() return H:JSONDecode(r.Body) end)
+            if s and d then
+                local t={}
+                for id,v in pairs(d) do if type(v)=="table" and v.t then v.id=id v.t=tonumber(v.t) or 0 table.insert(t,v) end end
+                table.sort(t,function(a,b) return a.t<b.t end)
+                if #t>15 then task.spawn(function() for i=1,(#t-15) do _Req({Url=_CDB.."/"..t[i].id..".json",Method="DELETE"}) end end) end
+                for _,v in ipairs(t) do 
+                    if v.t>L_Last then 
+                        local isEcho = (v.rn==P.Name and v.m==_LM and math.abs(v.t-_LT)<5)
+                        if not isEcho then _Add(v.u,v.m,v.rn,v.t) end
+                        L_Last=v.t 
+                    end 
+                end 
+            end 
+        end 
+    end 
+end)
+_Log("Chat & Plugins Loaded")
+
 end)()
