@@ -1,8 +1,8 @@
 task.spawn(function()
     local L,U,H,C,S,T=game:GetService("Players"),game:GetService("UserInputService"),game:GetService("HttpService"),game:GetService("CoreGui"),game:GetService("StarterGui"),game:GetService("TextChatService")
     local P=L.LocalPlayer
-    local _DB="https://rdb001-d0bda-default-rtdb.firebaseio.com/chat"
-    local _M="leolindoxx25"
+    local _DB="YourRealtimeDB"
+    local _M="YourUsername"
     local _LT=0
     local _LM=""
 
